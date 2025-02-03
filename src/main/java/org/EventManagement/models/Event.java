@@ -4,9 +4,20 @@ import java.sql.Date;
 
 public class Event {
     private String name;
-    private Date date;
+    private String date;
     private String location;
     private String description;
+
+    public Event(String name, String date, String location, String description) {
+        this.name = name;
+        this.description = description;
+        this.location = location;
+        this.date = date;
+    }
+
+    public Event() {
+
+    }
 
     public String getName() {
         return name;
@@ -16,11 +27,11 @@ public class Event {
         this.name = name;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 
