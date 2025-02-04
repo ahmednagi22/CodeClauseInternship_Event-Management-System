@@ -3,12 +3,22 @@ import java.time.LocalDate;
 import java.sql.Date;
 
 public class Event {
+    private int id;
     private String name;
     private String date;
     private String location;
     private String description;
 
-    public Event(String name, String date, String location, String description) {
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public Event(int id,String name, String date, String location, String description) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.location = location;

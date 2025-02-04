@@ -21,8 +21,8 @@ public class EventService {
     public void updateEvent(Event event) {
         eventRepository.updateEvent(event);
     }
-    public void deleteEvent(String name) {
-        eventRepository.deleteEvent(name);
+    public void deleteEvent(int id) {
+        eventRepository.deleteEvent(id);
     }
     public List<Event> searchEventsByName(String name) {
         return eventRepository.searchEventsByName(name);
