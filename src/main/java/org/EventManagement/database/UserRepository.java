@@ -1,50 +1,50 @@
 package org.EventManagement.database;
 
 import org.EventManagement.models.Attendee;
-import org.EventManagement.models.Event;
-import java.sql.*;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import org.EventManagement.models.User;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AttendeeRepository {
-    public void addAttendee(Attendee attendee) {
-        String query = "INSERT INTO attendees (name, email, phone, event_id) VALUES(?,?,?,?)";
+public class UserRepository {
+    public void addUser(User user) {
+        String query = "INSERT INTO users (username, password, role) VALUES(?,?,?)";
         try (Connection connection = DatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
-            statement.setString(1, attendee.getName());
-            statement.setString(2, attendee.getEmail());
-            statement.setString(3, attendee.getPhone());
-            statement.setInt(4, attendee.getEventId());
+            statement.setString(1, user.getUserName());
+            statement.setString(2, user.getPassword());
+            statement.setString(3, user.getRole());
             statement.executeUpdate();
-            System.out.println("attendee added successfully!");
+            System.out.println("user added successfully!");
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error adding attendee: " + e.getMessage());
+            throw new RuntimeException("Error adding user: " + e.getMessage());
         }
     }
 
-    public void updateAttendee(Attendee attendee) {
-        String query = "UPDATE attendee SET name = ?, email = ?, phone = ? , event_id = ? WHERE id = ?";
+    public void updateUser(User user) {
+        String query = "UPDATE users SET username = ?, password = ?, role = ? WHERE id = ?";
         try (Connection connection = DatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
-            statement.setString(1, attendee.getName());
-            statement.setString(2, attendee.getEmail());
-            statement.setString(3, attendee.getPhone());
-            statement.setInt(4, attendee.getEventId());
-            statement.setInt(5, attendee.getId());
+            statement.setString(1, user.getUserName());
+            statement.setString(2, user.getPassword());
+            statement.setString(3, user.getRole());
+            statement.setInt(4, user.getId());
             int rowsUpdated = statement.executeUpdate();
             if (rowsUpdated > 0) {
-                System.out.println("Attendee updated successfully!");
+                System.out.println("User updated successfully!");
             } else {
-                System.out.println("No attendee found with that id.");
+                System.out.println("No User found with that id.");
             }
 
         } catch (SQLException e) {
-            System.out.println("Error updating attendee: " + e.getMessage());
+            System.out.println("Error updating User: " + e.getMessage());
         }
     }
 
@@ -139,5 +139,18 @@ public class AttendeeRepository {
         return attendee;
     }
 
-}
+    public boolean authenticateUser(String username, String password) {
+        String query = "SELECT * FROM users WHERE username = ? AND password = ?";
+        try(Connection connection = DatabaseConnector.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query);) {
+            statement.setString(1, username);
+            statement.setString(2, password);
+            ResultSet resultSet = statement.executeQuery();
+            return resultSet.next(); // return true if user exist
 
+        }
+        catch (Exception e) {
+            return false;
+        }
+    }
+}
