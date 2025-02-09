@@ -7,13 +7,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
 
 public class LoginFrame extends JFrame{
     private JTextField userNameField;
     private JPasswordField passwordField;
-    JButton loginButton;
+    JButton loginButton, signupButton;
     UserService userService = new UserService(new UserRepository());
+    static LoginFrame loginFrame;
     public LoginFrame() {
         setTitle("Login");
         setSize(400, 350);
@@ -36,8 +36,11 @@ public class LoginFrame extends JFrame{
         userLabel.setBounds(50, 80, 100, 20);
         panel.add(userLabel);
 
-        userNameField = new RoundedTextField(15);
+        userNameField = new JTextField(15);
         userNameField.setBounds(50, 100, 300, 40);
+        userNameField.setBackground(Color.lightGray);
+        userNameField.setFont(new Font("Arial", Font.PLAIN, 16));
+        userNameField.setBorder(null);
         panel.add(userNameField);
 
         JLabel passLabel = new JLabel("Password");
@@ -47,6 +50,9 @@ public class LoginFrame extends JFrame{
 
         passwordField = new JPasswordField();
         passwordField.setBounds(50, 170, 300, 40);
+        passwordField.setBackground(Color.lightGray);
+        passwordField.setFont(new Font("Arial", Font.PLAIN, 16));
+        passwordField.setBorder(null);
         panel.add(passwordField);
 
         loginButton = new JButton("Login");
@@ -56,29 +62,39 @@ public class LoginFrame extends JFrame{
         loginButton.setFont(new Font("Arial", Font.BOLD, 16));
         loginButton.setFocusPainted(false);
         loginButton.setBorderPainted(false);
-        loginButton.addActionListener(new LoginButtonListener());
+        loginButton.addActionListener(new ButtonListener());
 
-        panel.add(loginButton);
-
-//        ImageIcon exitIcon = new ImageIcon("exitIcon.png");
-//        JButton exitButton = new JButton();
-//        exitButton.setIcon(exitIcon);
-//        exitButton.setBounds(0,0,100,100);
-//        panel.add(exitButton);
+          panel.add(loginButton);
+        signupButton = new JButton("Sign Up");
+        signupButton.setBounds(125,280,150,30);
+        signupButton.setBackground(new Color(80,153,255));
+        signupButton.setForeground(Color.WHITE);
+        signupButton.setFont(new Font("Arial", Font.BOLD,16));
+        signupButton.setFocusPainted(false);
+        signupButton.setBorderPainted(false);
+        signupButton.addActionListener(new ButtonListener());
+        panel.add(signupButton);
         add(panel);
     }
-    private class LoginButtonListener implements ActionListener{
+    private class ButtonListener implements ActionListener{
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String username = userNameField.getText();
-            String password = new String(passwordField.getPassword());
-            System.out.println("username : "+username + " password : "+password);
-            if (userService.authenticateUser(username, password)){
-                System.out.println("user exist ");
+            if(e.getSource() == loginButton){
+                String username = userNameField.getText();
+                String password = new String(passwordField.getPassword());
+                System.out.println("username : "+username + " password : "+password);
+                if (userService.authenticateUser(username, password)){
+                    new Dashboard().setVisible(true);
+                    loginFrame.dispose();
+                }
+                else{
+                    JOptionPane.showMessageDialog(null, "Invalid Username or Password!", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
-            else{
-                System.out.println("user not found");
+            else if (e.getSource() == signupButton) {
+                new SignupFrame().setVisible(true);
+                loginFrame.dispose();
             }
         }
     }
@@ -86,7 +102,7 @@ public class LoginFrame extends JFrame{
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            LoginFrame loginFrame = new LoginFrame();
+            loginFrame = new LoginFrame();
             loginFrame.setVisible(true);
         });
     }

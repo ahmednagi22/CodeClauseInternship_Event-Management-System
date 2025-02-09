@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserRepository {
-    public void addUser(User user) {
+    public boolean addUser(User user) {
         String query = "INSERT INTO users (username, password, role) VALUES(?,?,?)";
         try (Connection connection = DatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
@@ -21,9 +21,9 @@ public class UserRepository {
             statement.setString(3, user.getRole());
             statement.executeUpdate();
             System.out.println("user added successfully!");
-
+            return true;
         } catch (SQLException e) {
-            throw new RuntimeException("Error adding user: " + e.getMessage());
+            return false;
         }
     }
 
@@ -86,7 +86,7 @@ public class UserRepository {
         }
     }
 
-    public List<Attendee> searchAttendeeByName(String name) {
+    public List<Attendee> searchUsersByUsername(String name) {
         String query = "SELECT * FROM attendees WHERE name = ?";
         List<Attendee> attendees = new ArrayList<>();
 

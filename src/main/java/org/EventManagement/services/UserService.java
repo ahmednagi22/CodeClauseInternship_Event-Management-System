@@ -16,8 +16,8 @@ public class UserService {
     public boolean authenticateUser(String username, String password){
         return userRepository.authenticateUser(username, password);
     }
-    public void addUser(User user){
-        userRepository.addUser(user);
+    public boolean addUser(User user){
+        return userRepository.addUser(user);
     }
 //    public List<User> getAllUsers(){
 //        return userRepository.getAllUsers();
@@ -28,8 +28,8 @@ public class UserService {
 //    public void deleteUser(int id) {
 //        userRepository.deleteUser(id);
 //    }
-//    public List<User> searchUsersByUsername(String name) {
-//        return userRepository.searchUsersByName(name);
+//    public Boolean searchUsersByUsername(String username) {
+//        return userRepository.searchUsersByUsername(username);
 //    }
 
 }
