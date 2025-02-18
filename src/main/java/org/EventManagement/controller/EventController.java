@@ -1,15 +1,15 @@
-package org.EventManagement.services;
+package org.EventManagement.controller;
 import org.EventManagement.database.EventRepository;
 import org.EventManagement.models.Event;
 
 import java.util.List;
 
-public class EventService {
+public class EventController {
 
     private final EventRepository eventRepository;
 
     // dependency injection by constructor
-    public EventService(EventRepository repository) {
+    public EventController(EventRepository repository) {
         this.eventRepository = repository;
     }
     public void createEvent(Event event){

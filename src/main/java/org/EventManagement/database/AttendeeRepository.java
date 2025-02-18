@@ -27,7 +27,7 @@ public class AttendeeRepository {
     }
 
     public void updateAttendee(Attendee attendee) {
-        String query = "UPDATE attendee SET name = ?, email = ?, phone = ? , event_id = ? WHERE id = ?";
+        String query = "UPDATE attendees SET name = ?, email = ?, phone = ? , event_id = ? WHERE id = ?";
         try (Connection connection = DatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
@@ -129,6 +129,23 @@ public class AttendeeRepository {
         }
     }
 
+    public Attendee getAttendeeById(int id) {
+        String query = "SELECT * FROM attendees WHERE id = ?";
+        try (Connection connection = DatabaseConnector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setInt(1, id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return mapResultSetToAttendee(resultSet);
+                }
+            }
+            return null;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving attendee: " + e.getMessage());
+        }
+    }
     private static Attendee mapResultSetToAttendee(ResultSet resultSet) throws SQLException {
         Attendee attendee = new Attendee();
         attendee.setId(resultSet.getInt("id"));

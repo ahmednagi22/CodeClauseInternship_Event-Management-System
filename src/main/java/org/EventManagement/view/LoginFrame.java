@@ -1,7 +1,7 @@
 package org.EventManagement.view;
 
 import org.EventManagement.database.UserRepository;
-import org.EventManagement.services.UserService;
+import org.EventManagement.controller.UserController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,11 +9,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class LoginFrame extends JFrame{
-    private JTextField userNameField;
+    private JTextField emailField;
     private JPasswordField passwordField;
-    JButton loginButton, signupButton;
-    UserService userService = new UserService(new UserRepository());
+    JButton loginButton, signupButton, exit;
+
+    UserController userController = new UserController(new UserRepository());
     static LoginFrame loginFrame;
+
     public LoginFrame() {
         setTitle("Login");
         setSize(400, 350);
@@ -31,17 +33,17 @@ public class LoginFrame extends JFrame{
         titleLabel.setBounds(130, 30, 150, 30);
         panel.add(titleLabel);
 
-        JLabel userLabel = new JLabel("Username");
+        JLabel userLabel = new JLabel("Email");
         userLabel.setForeground(Color.WHITE);
         userLabel.setBounds(50, 80, 100, 20);
         panel.add(userLabel);
 
-        userNameField = new JTextField(15);
-        userNameField.setBounds(50, 100, 300, 40);
-        userNameField.setBackground(Color.lightGray);
-        userNameField.setFont(new Font("Arial", Font.PLAIN, 16));
-        userNameField.setBorder(null);
-        panel.add(userNameField);
+        emailField = new JTextField(15);
+        emailField.setBounds(50, 100, 300, 40);
+        emailField.setBackground(Color.lightGray);
+        emailField.setFont(new Font("Arial", Font.PLAIN, 16));
+        emailField.setBorder(null);
+        panel.add(emailField);
 
         JLabel passLabel = new JLabel("Password");
         passLabel.setForeground(Color.WHITE);
@@ -55,6 +57,15 @@ public class LoginFrame extends JFrame{
         passwordField.setBorder(null);
         panel.add(passwordField);
 
+        exit = new JButton();
+        exit.setBounds(367,5,30,30);
+        ImageIcon icon = new ImageIcon("G:\\colledge\\CodeClause Internship\\Event Management System\\src\\main\\java\\org\\EventManagement\\Exit_button.png");
+        icon = new ImageIcon(icon.getImage().getScaledInstance(36,36,Image.SCALE_SMOOTH));
+        exit.setIcon(icon);
+        exit.setBorderPainted(false);
+        exit.setFocusPainted(false);
+        exit.addActionListener(e -> System.exit(0));
+        panel.add(exit);
         loginButton = new JButton("Login");
         loginButton.setBounds(100, 230, 200, 40);
         loginButton.setBackground(new Color(51, 153, 255));
@@ -64,7 +75,7 @@ public class LoginFrame extends JFrame{
         loginButton.setBorderPainted(false);
         loginButton.addActionListener(new ButtonListener());
 
-          panel.add(loginButton);
+        panel.add(loginButton);
         signupButton = new JButton("Sign Up");
         signupButton.setBounds(125,280,150,30);
         signupButton.setBackground(new Color(80,153,255));
@@ -81,11 +92,17 @@ public class LoginFrame extends JFrame{
         @Override
         public void actionPerformed(ActionEvent e) {
             if(e.getSource() == loginButton){
-                String username = userNameField.getText();
+                String username = emailField.getText();
                 String password = new String(passwordField.getPassword());
                 System.out.println("username : "+username + " password : "+password);
-                if (userService.authenticateUser(username, password)){
-                    new Dashboard().setVisible(true);
+                if (userController.authenticateUser(username, password)){
+                    //get user role
+                    String role = userController.get_user_role(username);
+                    switch (role) {
+                        case "admin" -> new AdminDashboard().setVisible(true);
+                        //case "organizer" -> new OrganizerDashboard().setVisible(true);
+                        //case "attendee" -> new AttendeeDashboard().setVisible(true);
+                    }
                     loginFrame.dispose();
                 }
                 else{
@@ -96,6 +113,7 @@ public class LoginFrame extends JFrame{
                 new SignupFrame().setVisible(true);
                 loginFrame.dispose();
             }
+
         }
     }
 

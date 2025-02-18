@@ -67,43 +67,50 @@ public class UserRepository {
         }
     }
 
-    public List<Attendee> getAllAttendees() {
-        String query = "SELECT * FROM attendees";
-        List<Attendee> attendees = new ArrayList<>();
+    public List<User> getAllUsers() {
+        String query = "SELECT * FROM users";
+        List<User> users = new ArrayList<>();
 
         try (Connection connection = DatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(query);
              ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
-                attendees.add(mapResultSetToAttendee(resultSet));
+                User user = new User();
+                user.setId(resultSet.getInt("id"));
+                user.setUserName(resultSet.getString("username"));
+                user.setPassword(resultSet.getString("password"));
+                user.setRole(resultSet.getString("role"));
+                users.add(user);
             }
-            System.out.println("Attendees retrieved successfully!");
-            return attendees;
+            return users;
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error retrieving attendees: " + e.getMessage());
+            throw new RuntimeException("Error retrieving users: " + e.getMessage());
         }
     }
 
-    public List<Attendee> searchUsersByUsername(String name) {
-        String query = "SELECT * FROM attendees WHERE name = ?";
-        List<Attendee> attendees = new ArrayList<>();
+    public User searchUsersByUsername(String username) {
+        String query = "SELECT * FROM users WHERE username = ?";
+        User user = null;
 
         try (Connection connection = DatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
-            statement.setString(1, name);
+            statement.setString(1, username);
             try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    attendees.add(mapResultSetToAttendee(resultSet));
+                if (resultSet.next()) {
+                    user = new User();
+                    user.setId(resultSet.getInt("id"));
+                    user.setUserName(resultSet.getString("username"));
+                    user.setPassword(resultSet.getString("password"));
+                    user.setRole(resultSet.getString("role"));
                 }
             }
-            System.out.println("Attendees retrieved successfully!");
-            return attendees;
+            return user;
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error retrieving attendees: " + e.getMessage());
+            throw new RuntimeException("Error retrieving user: " + e.getMessage());
         }
     }
 
@@ -151,6 +158,26 @@ public class UserRepository {
         }
         catch (Exception e) {
             return false;
+        }
+    }
+
+    public String get_user_role(String username){
+        String query = "SELECT role FROM users WHERE username = ?";
+        try(Connection connection = DatabaseConnector.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query);){
+
+            statement.setString(1, username);
+            ResultSet resultSet = statement.executeQuery();
+            if(resultSet.next()){
+                return resultSet.getString("role");
+            }
+            else {
+                System.out.println("User doesn't exist!!");
+                return null;
+            }
+        }catch (Exception e){
+            e.printStackTrace(); // log the exception for debugging
+            return null;
         }
     }
 }

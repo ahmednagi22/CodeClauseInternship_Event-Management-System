@@ -1,17 +1,15 @@
-package org.EventManagement.services;
+package org.EventManagement.controller;
 import org.EventManagement.database.AttendeeRepository;
-import org.EventManagement.database.EventRepository;
 import org.EventManagement.models.Attendee;
-import org.EventManagement.models.Event;
 
 import java.util.List;
 
-public class AttendeeService{
+public class AttendeeController {
 
     private final AttendeeRepository attendeeRepository;
 
     // dependency injection by constructor
-    public AttendeeService(AttendeeRepository attendeeRepository) {
+    public AttendeeController(AttendeeRepository attendeeRepository) {
         this.attendeeRepository = attendeeRepository;
     }
     public void addAttendee(Attendee attendee){

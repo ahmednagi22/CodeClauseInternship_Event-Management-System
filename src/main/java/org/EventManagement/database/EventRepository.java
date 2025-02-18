@@ -28,7 +28,7 @@ public class EventRepository {
     }
 
     public void updateEvent(Event event) {
-        String query = "UPDATE events SET set name = ?, date = ?, location = ?, description = ? WHERE id = ?";
+        String query = "UPDATE events SET name = ?, date = ?, location = ?, description = ? WHERE id = ?";
         try (Connection connection = DatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, event.getName());
@@ -67,6 +67,24 @@ public class EventRepository {
 
         } catch (SQLException e) {
             throw new RuntimeException("Error retrieving events: " + e.getMessage());
+        }
+    }
+
+    public Event getEventById(int id) {
+        String query = "SELECT * FROM events WHERE id = ?";
+        try (Connection connection = DatabaseConnector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setInt(1, id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return mapResultSetToEvent(resultSet);
+                }
+            }
+            return null;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving event: " + e.getMessage());
         }
     }
 
