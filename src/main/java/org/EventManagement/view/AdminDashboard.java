@@ -40,13 +40,13 @@ public class AdminDashboard extends JFrame {
         dashboardPanel.setBackground(Color.WHITE);
         dashboardPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        dashboardPanel.add(createCard("7", "Total Events", new Color(52, 152, 219)));
-        dashboardPanel.add(createCard("2", "Upcoming Events", new Color(243, 156, 18)));
-        dashboardPanel.add(createCard("2", "Total Users", new Color(231, 76, 60)));
-        dashboardPanel.add(createCard("2", "Total Bookings", new Color(243, 156, 18)));
-        dashboardPanel.add(createCard("0", "New Schedule", new Color(52, 152, 219)));
-        dashboardPanel.add(createCard("2", "Confirmed Bookings", new Color(46, 204, 113)));
-        dashboardPanel.add(createCard("0", "Cancelled Bookings", new Color(231, 76, 60)));
+        dashboardPanel.add(Utils.createCard("7", "Total Events", new Color(52, 152, 219)));
+        dashboardPanel.add(Utils.createCard("2", "Upcoming Events", new Color(243, 156, 18)));
+        dashboardPanel.add(Utils.createCard("2", "Total Users", new Color(231, 76, 60)));
+        dashboardPanel.add(Utils.createCard("2", "Total Bookings", new Color(243, 156, 18)));
+        dashboardPanel.add(Utils.createCard("0", "New Schedule", new Color(52, 152, 219)));
+        dashboardPanel.add(Utils.createCard("2", "Confirmed Bookings", new Color(46, 204, 113)));
+        dashboardPanel.add(Utils.createCard("0", "Cancelled Bookings", new Color(231, 76, 60)));
 
         add(sidebar, BorderLayout.WEST);
         add(dashboardPanel, BorderLayout.CENTER);
@@ -87,7 +87,8 @@ public class AdminDashboard extends JFrame {
         } else if (buttonText.equals("Manage Schedule")) {
             // Handle Manage Schedule button click
         } else if (buttonText.equals("Manage Users")) {
-            // Handle Manage Users button click
+            this.dispose();
+            new ManageUsers().setVisible(true);
         } else if (buttonText.equals("Logout")) {
             this.dispose();
             new LoginFrame().setVisible(true);
@@ -95,32 +96,7 @@ public class AdminDashboard extends JFrame {
         }
     }
 
-    private JPanel createCard(String number, String title, Color color) {
-        JPanel card = new JPanel(new BorderLayout());
-        card.setBackground(color);
-        card.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        card.setPreferredSize(new Dimension(180, 100));
 
-        JLabel titleLabel = new JLabel(title, SwingConstants.CENTER);
-        titleLabel.setForeground(Color.WHITE);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
-
-        JLabel numLabel = new JLabel(number, SwingConstants.CENTER);
-        numLabel.setForeground(Color.WHITE);
-        numLabel.setFont(new Font("Arial", Font.BOLD, 28));
-
-        JButton detailsButton = new JButton("View Details");
-        detailsButton.setBackground(Color.WHITE);
-        detailsButton.setForeground(color);
-        detailsButton.setBorderPainted(false);
-        detailsButton.setFocusPainted(false);
-        detailsButton.setFont(new Font("Arial", Font.BOLD, 12));
-
-        card.add(titleLabel, BorderLayout.NORTH);
-        card.add(numLabel, BorderLayout.CENTER);
-        card.add(detailsButton, BorderLayout.SOUTH);
-        return card;
-    }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {

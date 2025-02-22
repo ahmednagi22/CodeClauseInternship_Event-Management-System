@@ -1,6 +1,7 @@
 package org.EventManagement.database;
 
 import org.EventManagement.models.Attendee;
+import org.EventManagement.models.Event;
 import org.EventManagement.models.User;
 
 import java.sql.Connection;
@@ -12,13 +13,15 @@ import java.util.List;
 
 public class UserRepository {
     public boolean addUser(User user) {
-        String query = "INSERT INTO users (username, password, role) VALUES(?,?,?)";
+        String query = "INSERT INTO users (first_name, last_name, email, password, role) VALUES(?,?,?,?,?)";
         try (Connection connection = DatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
-            statement.setString(1, user.getUserName());
-            statement.setString(2, user.getPassword());
-            statement.setString(3, user.getRole());
+            statement.setString(1, user.getFirstName());
+            statement.setString(2, user.getLastName());
+            statement.setString(3, user.getEmail());
+            statement.setString(4, user.getPassword());
+            statement.setString(5, user.getRole());
             statement.executeUpdate();
             System.out.println("user added successfully!");
             return true;
@@ -27,29 +30,88 @@ public class UserRepository {
         }
     }
 
-    public void updateUser(User user) {
-        String query = "UPDATE users SET username = ?, password = ?, role = ? WHERE id = ?";
+    public boolean updateUser(User user) {
+        String query = "UPDATE users SET first_name = ?, last_name = ?, email = ?, password = ?, role = ? WHERE id = ?";
         try (Connection connection = DatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, user.getFirstName());
+            statement.setString(2, user.getLastName());
+            statement.setString(3, user.getEmail());
+            statement.setString(4, user.getPassword());
+            statement.setString(5, user.getRole());
+            statement.setInt(6, user.getId());
 
-            statement.setString(1, user.getUserName());
-            statement.setString(2, user.getPassword());
-            statement.setString(3, user.getRole());
-            statement.setInt(4, user.getId());
             int rowsUpdated = statement.executeUpdate();
             if (rowsUpdated > 0) {
                 System.out.println("User updated successfully!");
+                return true;
             } else {
-                System.out.println("No User found with that id.");
+                System.out.println("No user found with that id.");
+                return false;
             }
 
         } catch (SQLException e) {
             System.out.println("Error updating User: " + e.getMessage());
+            return false;
         }
     }
 
-    public void deleteAttendee(int id) {
-        String query = "DELETE FROM attendee WHERE id = ?";
+    public User findByEmail(String email) {
+        String query = "SELECT * FROM users WHERE email = ?";
+        try(Connection connection = DatabaseConnector.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query);) {
+            statement.setString(1, email);
+            try(ResultSet resultSet = statement.executeQuery()){
+                if(resultSet.next()){
+                    return new User(
+                            resultSet.getInt("id"),
+                            resultSet.getString("first_name"),
+                            resultSet.getString("last_name"),
+                            resultSet.getString("email"),
+                            resultSet.getString("password"),
+                            resultSet.getString("role")
+                    );
+                }
+                else {
+                    System.out.println("User doesn't exist!!");
+                    return null;
+                }
+            }
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
+
+    public User getUserById(int userId) {
+        String query = "SELECT * FROM users WHERE id = ?";
+        try(Connection connection = DatabaseConnector.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query);) {
+            statement.setInt(1, userId);
+            try(ResultSet resultSet = statement.executeQuery()){
+                if(resultSet.next()){
+                    return new User(
+                            resultSet.getInt("id"),
+                            resultSet.getString("first_name"),
+                            resultSet.getString("last_name"),
+                            resultSet.getString("email"),
+                            resultSet.getString("password"),
+                            resultSet.getString("role")
+                    );
+                }
+                else {
+                    System.out.println("User doesn't exist!!");
+                    return null;
+                }
+            }
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
+
+    public boolean deleteUser(int id) {
+        String query = "DELETE FROM users WHERE id = ?";
         try (Connection connection = DatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
@@ -57,16 +119,39 @@ public class UserRepository {
             int rowsDeleted = statement.executeUpdate();
 
             if (rowsDeleted > 0) {
-                System.out.println("Attendee deleted successfully!");
+                System.out.println("User deleted successfully!");
+                return true;
             } else {
-                System.out.println("No attendee found with that id.");
+                System.out.println("No User found with that id.");
+                return false;
             }
 
         } catch (SQLException e) {
-            System.out.println("Error deleting attendee: " + e.getMessage());
+            System.out.println("Error deleting User: " + e.getMessage());
+            return false;
         }
     }
 
+    public String get_user_role(String email){
+        String query = "SELECT role FROM users WHERE email = ?";
+        try(Connection connection = DatabaseConnector.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query);){
+
+            statement.setString(1, email);
+            ResultSet resultSet = statement.executeQuery();
+            if(resultSet.next()){
+
+                System.out.println(resultSet.getString("role"));
+                return resultSet.getString("role");
+            }
+            else {
+                System.out.println("User doesn't exist!!");
+                return null;
+            }
+        }catch (Exception e){
+            return null;
+        }
+    }
     public List<User> getAllUsers() {
         String query = "SELECT * FROM users";
         List<User> users = new ArrayList<>();
@@ -76,43 +161,47 @@ public class UserRepository {
              ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
-                User user = new User();
-                user.setId(resultSet.getInt("id"));
-                user.setUserName(resultSet.getString("username"));
-                user.setPassword(resultSet.getString("password"));
-                user.setRole(resultSet.getString("role"));
-                users.add(user);
+                users.add( new User(
+                        resultSet.getInt("id"),
+                        resultSet.getString("first_name"),
+                        resultSet.getString("last_name"),
+                        resultSet.getString("email"),
+                        resultSet.getString("password"),
+                        resultSet.getString("role")
+                ));
             }
             return users;
 
         } catch (SQLException e) {
             throw new RuntimeException("Error retrieving users: " + e.getMessage());
+
         }
     }
-
-    public User searchUsersByUsername(String username) {
-        String query = "SELECT * FROM users WHERE username = ?";
-        User user = null;
-
-        try (Connection connection = DatabaseConnector.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
-
-            statement.setString(1, username);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    user = new User();
-                    user.setId(resultSet.getInt("id"));
-                    user.setUserName(resultSet.getString("username"));
-                    user.setPassword(resultSet.getString("password"));
-                    user.setRole(resultSet.getString("role"));
-                }
-            }
-            return user;
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Error retrieving user: " + e.getMessage());
-        }
-    }
+//    public User searchUsersByUsername(String username) {
+//        String query = "SELECT * FROM users WHERE username = ?";
+//        User user = null;
+//
+//        try (Connection connection = DatabaseConnector.getConnection();
+//             PreparedStatement statement = connection.prepareStatement(query)) {
+//
+//            statement.setString(1, username);
+//            try (ResultSet resultSet = statement.executeQuery()) {
+//                if (resultSet.next()) {
+//                    user = new User();
+//                    user.setId(resultSet.getInt("id"));
+//                    user.setUserName(resultSet.getString("username"));
+//                    user.setPassword(resultSet.getString("password"));
+//                    user.setRole(resultSet.getString("role"));
+//                }
+//            }
+//            return user;
+//
+//        } catch (SQLException e) {
+//            throw new RuntimeException("Error retrieving user: " + e.getMessage());
+//
+//        }
+//
+//    }
 
     public List<Attendee> getAttendeesByEvent(int eventId) {
         String query = "SELECT * FROM attendees WHERE event_id = ?";
@@ -144,40 +233,5 @@ public class UserRepository {
         attendee.setPhone(resultSet.getString("phone"));
         attendee.setEventId(resultSet.getInt("event_id"));
         return attendee;
-    }
-
-    public boolean authenticateUser(String username, String password) {
-        String query = "SELECT * FROM users WHERE username = ? AND password = ?";
-        try(Connection connection = DatabaseConnector.getConnection();
-            PreparedStatement statement = connection.prepareStatement(query);) {
-            statement.setString(1, username);
-            statement.setString(2, password);
-            ResultSet resultSet = statement.executeQuery();
-            return resultSet.next(); // return true if user exist
-
-        }
-        catch (Exception e) {
-            return false;
-        }
-    }
-
-    public String get_user_role(String username){
-        String query = "SELECT role FROM users WHERE username = ?";
-        try(Connection connection = DatabaseConnector.getConnection();
-            PreparedStatement statement = connection.prepareStatement(query);){
-
-            statement.setString(1, username);
-            ResultSet resultSet = statement.executeQuery();
-            if(resultSet.next()){
-                return resultSet.getString("role");
-            }
-            else {
-                System.out.println("User doesn't exist!!");
-                return null;
-            }
-        }catch (Exception e){
-            e.printStackTrace(); // log the exception for debugging
-            return null;
-        }
     }
 }

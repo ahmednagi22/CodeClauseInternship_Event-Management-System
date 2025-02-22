@@ -9,12 +9,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class LoginFrame extends JFrame{
-    private JTextField emailField;
-    private JPasswordField passwordField;
+    static LoginFrame loginFrame;
+
+    private final JTextField emailField;
+    private final JPasswordField passwordField;
     JButton loginButton, signupButton, exit;
 
     UserController userController = new UserController(new UserRepository());
-    static LoginFrame loginFrame;
 
     public LoginFrame() {
         setTitle("Login");
@@ -59,7 +60,8 @@ public class LoginFrame extends JFrame{
 
         exit = new JButton();
         exit.setBounds(367,5,30,30);
-        ImageIcon icon = new ImageIcon("G:\\colledge\\CodeClause Internship\\Event Management System\\src\\main\\java\\org\\EventManagement\\Exit_button.png");
+        ImageIcon icon = new ImageIcon(
+                "src/main/resources/Exit_button.png");
         icon = new ImageIcon(icon.getImage().getScaledInstance(36,36,Image.SCALE_SMOOTH));
         exit.setIcon(icon);
         exit.setBorderPainted(false);
@@ -92,21 +94,24 @@ public class LoginFrame extends JFrame{
         @Override
         public void actionPerformed(ActionEvent e) {
             if(e.getSource() == loginButton){
-                String username = emailField.getText();
+                String email = emailField.getText();
                 String password = new String(passwordField.getPassword());
-                System.out.println("username : "+username + " password : "+password);
-                if (userController.authenticateUser(username, password)){
-                    //get user role
-                    String role = userController.get_user_role(username);
-                    switch (role) {
-                        case "admin" -> new AdminDashboard().setVisible(true);
+                System.out.println("Email : "+email + " Password : "+password);
+                if (userController.authenticateUser(email, password)){
+                    //  Return user role
+                    String role = userController.get_user_role(email);
+                    System.out.println("user -> "+ role);
+                    if(role != null){
+                        switch (role) {
+                        case "Admin" -> new AdminDashboard().setVisible(true);
                         //case "organizer" -> new OrganizerDashboard().setVisible(true);
-                        //case "attendee" -> new AttendeeDashboard().setVisible(true);
+                        case "Attendee" -> new AttendeeDashboard().setVisible(true);
+                    }
                     }
                     loginFrame.dispose();
                 }
                 else{
-                    JOptionPane.showMessageDialog(null, "Invalid Username or Password!", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Invalid Email or Password!", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
             else if (e.getSource() == signupButton) {
