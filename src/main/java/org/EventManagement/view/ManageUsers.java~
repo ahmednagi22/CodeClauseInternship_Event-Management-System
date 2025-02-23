@@ -1,0 +1,175 @@
+package org.EventManagement.view;
+
+import org.EventManagement.controller.UserController;
+import org.EventManagement.database.UserRepository;
+import org.EventManagement.models.User;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.List;
+
+public class ManageUsers extends JFrame {
+    private static final Color SIDEBAR_COLOR = new Color(44, 62, 80);
+    private static final Color BUTTON_COLOR = new Color(52, 73, 94);
+    private static final Color BUTTON_HOVER_COLOR = new Color(67, 92, 115);
+    private static final Dimension SIDEBAR_SIZE = new Dimension(200, 0);
+
+    private static final UserController userController;
+    private static DefaultTableModel tableModel;
+    private static JPanel cardsPanel;
+
+    public ManageUsers() {
+        setTitle("Event Management System | Manage Users | Admin Panel");
+        setSize(950, 550);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
+        setResizable(false);
+
+        userController = new UserController(new UserRepository());
+
+        JPanel dashboardPanel = createDashboardPanel();
+        JPanel sidebar = createSidebar();
+
+        add(sidebar, BorderLayout.WEST);
+        add(dashboardPanel, BorderLayout.CENTER);
+    }
+
+    private JPanel createDashboardPanel() {
+        JPanel dashboardPanel = new JPanel(new BorderLayout());
+        dashboardPanel.setBackground(Color.WHITE);
+
+        tableModel = new DefaultTableModel(new String[]{"ID", "First Name", "Last Name", "Email", "Role"}, 0);
+        JTable table = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(table);
+
+        cardsPanel = new JPanel(new GridLayout(1, 3, 10, 10));
+        cardsPanel.setBackground(Color.WHITE);
+        cardsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        refreshTableData();
+
+        dashboardPanel.add(scrollPane, BorderLayout.CENTER);
+        dashboardPanel.add(cardsPanel, BorderLayout.SOUTH);
+        return dashboardPanel;
+    }
+
+    private JPanel createSidebar() {
+        JPanel sidebar = new JPanel();
+        sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
+        sidebar.setBackground(SIDEBAR_COLOR);
+        sidebar.setPreferredSize(SIDEBAR_SIZE);
+
+        String[] buttonLabels = {"Dashboard", "Add User", "Edit User", "Remove User", "Logout"};
+        for (String label : buttonLabels) {
+            sidebar.add(createSidebarButton(label));
+        }
+        return sidebar;
+    }
+
+    private JButton createSidebarButton(String text) {
+        JButton button = new JButton(text);
+        button.setForeground(Color.WHITE);
+        button.setBackground(BUTTON_COLOR);
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setAlignmentX(Component.CENTER_ALIGNMENT);
+        button.setMaximumSize(new Dimension(180, 45));
+
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) { button.setBackground(BUTTON_HOVER_COLOR); }
+            public void mouseExited(java.awt.event.MouseEvent evt) { button.setBackground(BUTTON_COLOR); }
+        });
+        button.addActionListener(this::handleButtonClick);
+        return button;
+    }
+
+    private void handleButtonClick(ActionEvent e) {
+        String buttonText = e.getActionCommand();
+        switch (buttonText) {
+            case "Dashboard" -> switchToDashboard();
+            case "Add User" -> new AddUser().setVisible(true);
+            case "Edit User" -> handleEditUser();
+            case "Remove User" -> handleRemoveUser();
+            case "Logout" -> logout();
+        }
+    }
+
+    private void switchToDashboard() {
+        this.dispose();
+        new AdminDashboard().setVisible(true);
+    }
+
+    private void handleEditUser() {
+        int userId = promptForUserId("Enter User ID to Edit:");
+        if (userId != -1) {
+            User user = userController.getUserById(userId);
+            if (user != null) {
+                new EditUser(user).setVisible(true);
+            } else {
+                showErrorMessage("User not found!");
+            }
+        }
+    }
+
+    private void handleRemoveUser() {
+        int userId = promptForUserId("Enter User ID to Remove:");
+        if (userId != -1 && userController.deleteUser(userId)) {
+            showSuccessMessage("User Deleted Successfully!");
+            refreshTableData();
+        } else {
+            showErrorMessage("User Not Found!");
+        }
+    }
+
+    private void logout() {
+        this.dispose();
+        new LoginFrame().setVisible(true);
+        showSuccessMessage("You Logged Out");
+    }
+
+    private int promptForUserId(String message) {
+        String idStr = JOptionPane.showInputDialog(this, message);
+        if (idStr != null && idStr.matches("\\d+")) {
+            return Integer.parseInt(idStr);
+        }
+        showErrorMessage("Invalid ID!");
+        return -1;
+    }
+
+    private void showErrorMessage(String message) {
+        JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    private void showSuccessMessage(String message) {
+        JOptionPane.showMessageDialog(this, message, "Success", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    static void refreshTableData() {
+        tableModel.setRowCount(0);
+        List<User> users = userController.getAllUsers();
+        users.forEach(user -> tableModel.addRow(new Object[]{
+                user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getRole()
+        }));
+        updateCardsPanel();
+    }
+
+    static void updateCardsPanel() {
+        cardsPanel.removeAll();
+        long adminCount = users.stream().filter(user -> "Admin".equals(user.getRole())).count();
+        long organizerCount = users.stream().filter(user -> "Organizer".equals(user.getRole())).count();
+        long attendeeCount = users.stream().filter(user -> "Attendee".equals(user.getRole())).count();
+
+        cardsPanel.add(Utils.createCard(String.valueOf(adminCount), "Total Admins", new Color(243, 156, 18)));
+        cardsPanel.add(Utils.createCard(String.valueOf(organizerCount), "Total Organizers", new Color(52, 152, 219)));
+        cardsPanel.add(Utils.createCard(String.valueOf(attendeeCount), "Total Attendees", new Color(39, 174, 96)));
+
+        cardsPanel.revalidate();
+        cardsPanel.repaint();
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new ManageUsers().setVisible(true));
+    }
+}

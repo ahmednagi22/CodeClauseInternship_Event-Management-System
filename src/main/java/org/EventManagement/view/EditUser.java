@@ -213,6 +213,8 @@ public class EditUser extends JFrame {
                         "Success",
                         JOptionPane.INFORMATION_MESSAGE
                 );
+                ManageUsers.refreshTableData(); // update User table in MangeUsers
+                ManageUsers.updateCardsPanel();
                 SwingUtilities.getWindowAncestor((Component) e.getSource()).dispose(); // Close registration frame
             } else {
                 showErrorDialog("Error in update user try again");
