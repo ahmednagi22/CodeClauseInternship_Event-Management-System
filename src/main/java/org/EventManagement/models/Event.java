@@ -9,12 +9,11 @@ public class Event {
     private String location;
     private String description;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+    public Event(String name, String date, String location, String description) {
+        this.name = name;
+        this.date = date;
+        this.location = location;
+        this.description = description;
     }
 
     public Event(int id,String name, String date, String location, String description) {
@@ -23,6 +22,14 @@ public class Event {
         this.description = description;
         this.location = location;
         this.date = date;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public Event() {

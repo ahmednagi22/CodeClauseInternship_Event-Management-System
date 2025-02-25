@@ -191,8 +191,6 @@ public class AddUser extends JFrame {
                             "Success",
                             JOptionPane.INFORMATION_MESSAGE
                     );
-                    ManageUsers.refreshTableData();
-                    ManageUsers.updateCardsPanel();
                     SwingUtilities.getWindowAncestor((Component) e.getSource()).dispose(); // Close registration frame
                 } else {
                     showErrorDialog("Email already taken!\nPlease try a different one.");

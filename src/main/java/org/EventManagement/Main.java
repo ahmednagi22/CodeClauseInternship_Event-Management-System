@@ -1,9 +1,9 @@
 package org.EventManagement;
 
-import org.EventManagement.database.UserRepository;
 
-import javax.swing.*;
-
+import org.EventManagement.models.User;
+import org.EventManagement.view.EditUser;
+import org.EventManagement.view.ManageUsers;
 
 public class Main {
     public static void main(String[] args) {
@@ -16,8 +16,6 @@ public class Main {
 //            System.out.println("attendee: " + attendee1.getName() + ",\nemail: " + attendee1.getEmail()+
 //                    ",\nphone: " + attendee1.getPhone());
 //        }
-        UserRepository u = new UserRepository();
-        System.out.println(u.get_user_role("admin"));
 
     }
 }

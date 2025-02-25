@@ -12,22 +12,25 @@ public class EventController {
     public EventController(EventRepository repository) {
         this.eventRepository = repository;
     }
-    public void createEvent(Event event){
-        eventRepository.createEvent(event);
+    public boolean addEvent(Event event){
+        return eventRepository.addEvent(event);
+    }
+    public boolean updateEvent(Event event) {
+        return eventRepository.updateEvent(event);
     }
     public List<Event> getAllEvents(){
         return eventRepository.getAllEvents();
     }
-    public void updateEvent(Event event) {
-        eventRepository.updateEvent(event);
-    }
-    public void deleteEvent(int id) {
-        eventRepository.deleteEvent(id);
+    public boolean deleteEvent(int id) {
+        return eventRepository.deleteEvent(id);
     }
     public List<Event> searchEventsByName(String name) {
         return eventRepository.searchEventsByName(name);
     }
     public List<Event> searchEventsByDate(String date){
         return eventRepository.searchEventsByDate(date);
+    }
+    public Event getEventById(int id){
+        return eventRepository.getEventById(id);
     }
 }

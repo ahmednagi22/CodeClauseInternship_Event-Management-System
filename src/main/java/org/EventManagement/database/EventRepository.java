@@ -10,7 +10,7 @@ import java.util.List;
 public class EventRepository {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public void createEvent(Event event) {
+    public boolean addEvent(Event event) {
         String query = "INSERT INTO events (name, date, location, description) VALUES(?,?,?,?)";
         try (Connection connection = DatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
@@ -21,13 +21,13 @@ public class EventRepository {
             statement.setString(4, event.getDescription());
             statement.executeUpdate();
             System.out.println("Event added successfully!");
-
+            return true;
         } catch (SQLException e) {
-            throw new RuntimeException("Error creating event: " + e.getMessage());
+                return false;
         }
     }
 
-    public void updateEvent(Event event) {
+    public boolean updateEvent(Event event) {
         String query = "UPDATE events SET name = ?, date = ?, location = ?, description = ? WHERE id = ?";
         try (Connection connection = DatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
@@ -40,12 +40,14 @@ public class EventRepository {
             int rowsUpdated = statement.executeUpdate();
             if (rowsUpdated > 0) {
                 System.out.println("Event updated successfully!");
+                return true;
             } else {
                 System.out.println("No event found with that id.");
+                return false;
             }
 
         } catch (SQLException e) {
-            System.out.println("Error updating event: " + e.getMessage());
+            return false;
         }
     }
 
@@ -129,7 +131,7 @@ public class EventRepository {
         }
     }
 
-    public void deleteEvent(int id) {
+    public boolean deleteEvent(int id) {
         String query = "DELETE FROM events WHERE id = ?";
         try (Connection connection = DatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
@@ -139,13 +141,16 @@ public class EventRepository {
 
             if (rowsDeleted > 0) {
                 System.out.println("Event deleted successfully!");
+                return true;
             } else {
                 System.out.println("No event found with that name.");
+                return false;
             }
 
         } catch (SQLException e) {
             System.out.println("Error deleting event: " + e.getMessage());
         }
+        return false;
     }
 
     private static Event mapResultSetToEvent(ResultSet resultSet) throws SQLException {

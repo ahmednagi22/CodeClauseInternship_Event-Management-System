@@ -3,7 +3,6 @@ package org.EventManagement.view;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class AdminDashboard extends JFrame {
     private static final Color SIDEBAR_COLOR = new Color(44, 62, 80);
@@ -83,7 +82,8 @@ public class AdminDashboard extends JFrame {
         } else if (buttonText.equals("Manage Attendees")) {
             // Handle Manage Attendees button click
         } else if (buttonText.equals("Manage Events")) {
-            // Handle Manage Events button click
+            this.dispose();
+            new ManageEvents().setVisible(true);
         } else if (buttonText.equals("Manage Schedule")) {
             // Handle Manage Schedule button click
         } else if (buttonText.equals("Manage Users")) {

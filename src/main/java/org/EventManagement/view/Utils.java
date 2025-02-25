@@ -2,8 +2,9 @@ package org.EventManagement.view;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
-public class Utils {
+public  class Utils {
     public static JPanel createCard(String number, String title, Color color) {
         JPanel card = new JPanel(new BorderLayout());
         card.setBackground(color);

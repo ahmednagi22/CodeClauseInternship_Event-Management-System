@@ -29,8 +29,6 @@ public class UserController {
     }
 
     public boolean addUser(User user){
-        System.out.println(user.getPassword());
-        System.out.println(hashPassword(user.getPassword()));
         user.setPassword(hashPassword(user.getPassword()));
         return userRepository.addUser(user);
     }

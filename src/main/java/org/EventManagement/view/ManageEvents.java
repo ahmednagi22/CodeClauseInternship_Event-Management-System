@@ -1,33 +1,35 @@
 package org.EventManagement.view;
 
-import org.EventManagement.controller.UserController;
-import org.EventManagement.database.UserRepository;
+import org.EventManagement.controller.EventController;
+import org.EventManagement.database.EventRepository;
 import org.EventManagement.models.Event;
-import org.EventManagement.models.User;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 
-public class ManageUsers extends JFrame {
+public class ManageEvents extends JFrame {
     private final Color SIDEBAR_COLOR = new Color(44, 62, 80);
     private final Color BUTTON_COLOR = new Color(52, 73, 94);
     private final Color BUTTON_HOVER_COLOR = new Color(67, 92, 115);
     private final Dimension SIDEBAR_SIZE = new Dimension(200, 0);
-    private final UserController userController;
+    private final EventController eventController;
     DefaultTableModel tableModel;
     private final JPanel cardsPanel;
-    public ManageUsers() {
-        setTitle("Event Management System | Manage Users | Admin Panel");
+    public ManageEvents() {
+        setTitle("Event Management System | Manage Events | Admin Panel");
         setSize(950, 550);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
         setResizable(false);
 
-        userController =new UserController(new UserRepository());
+        eventController =new EventController(new EventRepository());
         // Main Dashboard Panel
         JPanel dashboardPanel = new JPanel();
         dashboardPanel.setLayout(new BorderLayout());
@@ -35,7 +37,7 @@ public class ManageUsers extends JFrame {
 
         // Table Panel
         JPanel tablePanel = new JPanel(new BorderLayout());
-        String[] columns = {"ID", "First Name","Last Name","Email", "Role"};
+        String[] columns = {"ID", "Event Name","Date","Location", "Description"};
 
         tableModel = new DefaultTableModel(columns, 0){
             @Override
@@ -69,8 +71,8 @@ public class ManageUsers extends JFrame {
 
         // Sidebar Buttons
         String[] buttonLabels = {
-                "Dashboard", "Add User", "Edit User",
-                "Remove User", "Logout"
+                "Dashboard", "Add Event", "Edit Event",
+                "Remove Event", "Logout"
         };
 
         for (String label : buttonLabels) {
@@ -99,7 +101,7 @@ public class ManageUsers extends JFrame {
             }
 
         });
-        button.addActionListener(e -> handleButtonClick(e));
+        button.addActionListener(this::handleButtonClick);
         return button;
     }
 
@@ -108,10 +110,10 @@ public class ManageUsers extends JFrame {
         switch (buttonText) {
             case "Dashboard" -> {this.dispose();new AdminDashboard().setVisible(true);}
             // Handle Dashboard button click
-            case "Add User" -> {
-                AddUser addUser = new AddUser();
-                addUser.setVisible(true);
-                addUser.addWindowListener(new java.awt.event.WindowAdapter() {
+            case "Add Event" -> {
+                AddEvent addEvent = new AddEvent();
+                addEvent.setVisible(true);
+                addEvent.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosed(java.awt.event.WindowEvent e) {
                         refreshTableData();
@@ -119,16 +121,16 @@ public class ManageUsers extends JFrame {
                     }
                 });
             }
-            case "Edit User" -> {
-                String  idStr = JOptionPane.showInputDialog(this,"Enter User ID to Edit:");
+            case "Edit Event" -> {
+                String  idStr = JOptionPane.showInputDialog(this,"Enter Event ID to Edit:");
                 // validate input as Integer
                 if(idStr != null && idStr.matches("\\d+")){
-                    int userId = Integer.parseInt(idStr);
-                    User user = userController.getUserById(userId);
-                    if(user != null){
-                        EditUser editUser = new EditUser(user);
-                        editUser.setVisible(true);
-                        editUser.addWindowListener(new java.awt.event.WindowAdapter() {
+                    int eventId = Integer.parseInt(idStr);
+                    Event event = eventController.getEventById(eventId);
+                    if(event != null){
+                        EditEvent editEvent = new EditEvent(event);
+                        editEvent.setVisible(true);
+                        editEvent.addWindowListener(new java.awt.event.WindowAdapter() {
                             @Override
                             public void windowClosed(java.awt.event.WindowEvent e) {
                                 refreshTableData();
@@ -137,25 +139,25 @@ public class ManageUsers extends JFrame {
                         });
                     }
                     else{
-                        JOptionPane.showMessageDialog(this, "User not found!", "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(this, "Event not found!", "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
                 else{
                     JOptionPane.showMessageDialog(this, "Invalid ID!", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
-            case "Remove User" -> {
-                String  idStr = JOptionPane.showInputDialog(this,"Enter User ID to Remove:");
+            case "Remove Event" -> {
+                String  idStr = JOptionPane.showInputDialog(this,"Enter Event ID to Remove:");
                 if(idStr != null && idStr.matches("\\d+")){
-                    int userId = Integer.parseInt(idStr);
+                    int eventId = Integer.parseInt(idStr);
 
-                    if(userController.deleteUser(userId)){
-                        JOptionPane.showMessageDialog(this, "User Deleted Successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    if(eventController.deleteEvent(eventId)){
+                        JOptionPane.showMessageDialog(this, "Event Deleted Successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                         refreshTableData();
                         updateCardsData();
                     }
                     else{
-                        JOptionPane.showMessageDialog(this, "User Not Found!!!", "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(this, "Event Not Found!!!", "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
                 else{
@@ -173,33 +175,42 @@ public class ManageUsers extends JFrame {
         // Clear existing rows
         tableModel.setRowCount(0);
         // Fetch updated list of users
-        List<User> users = userController.getAllUsers();
-        System.out.println("Fetched " + users.size() + " users"); // Debug statement
+        List<Event> events = eventController.getAllEvents();
+        System.out.println("Fetched " + events.size() + " users"); // Debug statement
         // Repopulate the table
-        for (User user : users) {
+        for (Event event : events) {
             tableModel.addRow(
                     new Object[]{
-                            user.getId(),
-                            user.getFirstName(),
-                            user.getLastName(),
-                            user.getEmail(),
-                            user.getRole()
+                            event.getId(),
+                            event.getName(),
+                            event.getDate(),
+                            event.getLocation(),
+                            event.getDescription()
                     }
             );
         }
     }
     private void updateCardsData() {
-        long adminCount = userController.getAllUsers().stream().filter(user -> "Admin".equals(user.getRole())).count();
-        long organizerCount = userController.getAllUsers().stream().filter(user -> "Organizer".equals(user.getRole())).count();
-        long attendeeCount = userController.getAllUsers().stream().filter(user -> "Attendee".equals(user.getRole())).count();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate today = LocalDate.now();
+
+        List<Event> events = eventController.getAllEvents();
+        long totalEvents = events.size();
+
+        long upcomingEvents = events.stream()
+                .filter(event -> LocalDate.parse(event.getDate(), formatter).isAfter(today))
+                .count();
+        long pastEvents = events.stream()
+                .filter(event -> LocalDate.parse(event.getDate(), formatter).isBefore(today)/* Add condition to check if event has passed */)
+                .count();
 
         // Remove old components
         cardsPanel.removeAll();
 
-        // Add updated cards
-        cardsPanel.add(Utils.createCard(String.valueOf(adminCount), "Total Admins", new Color(243, 156, 18)));
-        cardsPanel.add(Utils.createCard(String.valueOf(organizerCount), "Total Organizers", new Color(52, 152, 219)));
-        cardsPanel.add(Utils.createCard(String.valueOf(attendeeCount), "Total Attendees", new Color(39, 174, 96)));
+        // Add updated event statistics cards
+        cardsPanel.add(Utils.createCard(String.valueOf(totalEvents), "Total Events", new Color(243, 156, 18)));
+        cardsPanel.add(Utils.createCard(String.valueOf(upcomingEvents), "Upcoming Events", new Color(52, 152, 219)));
+        cardsPanel.add(Utils.createCard(String.valueOf(pastEvents), "Past Events", new Color(39, 174, 96)));
 
         // Refresh the UI
         cardsPanel.revalidate();
