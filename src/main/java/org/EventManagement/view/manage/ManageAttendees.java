@@ -5,6 +5,7 @@ import org.EventManagement.database.AttendeeRepository;
 import org.EventManagement.models.Attendee;
 import org.EventManagement.view.Dashboards.AdminDashboard;
 import org.EventManagement.view.Authentication.LoginFrame;
+import org.EventManagement.view.Dashboards.OrganizerDashboard;
 import org.EventManagement.view.add.AddAttendee;
 import org.EventManagement.view.edit.EditAttendee;
 
@@ -21,7 +22,9 @@ public class ManageAttendees extends JFrame {
     private final Dimension SIDEBAR_SIZE = new Dimension(200, 0);
     private final AttendeeController attendeeController;
     DefaultTableModel tableModel;
+    String title ;
     public ManageAttendees(String title) {
+        this.title = title;
         setTitle("Event Management System | Manage Attendees | "+title+" Panel");
         setSize(950, 550);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -104,7 +107,14 @@ public class ManageAttendees extends JFrame {
     private void handleButtonClick(ActionEvent e) {
         String buttonText = e.getActionCommand();
         switch (buttonText) {
-            case "Dashboard" -> {this.dispose();new AdminDashboard().setVisible(true);}
+            case "Dashboard" -> {
+                switch (title) {
+                    case "Admin" -> new AdminDashboard().setVisible(true);
+                    case "Organizer" -> new OrganizerDashboard().setVisible(true);
+                }
+                this.dispose();
+
+            }
             // Handle Dashboard button click
             case "Add Attendee" -> {
                 AddAttendee addAttendee = new AddAttendee();

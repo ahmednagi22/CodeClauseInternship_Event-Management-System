@@ -51,27 +51,6 @@ public class EventRepository {
         }
     }
 
-    public List<Event> searchEventsByName(String name) {
-        String query = "SELECT * FROM events WHERE name = ?";
-        List<Event> events = new ArrayList<>();
-
-        try (Connection connection = DatabaseConnector.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
-
-            statement.setString(1, name);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    events.add(mapResultSetToEvent(resultSet));
-                }
-            }
-            System.out.println("Events retrieved successfully!");
-            return events;
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Error retrieving events: " + e.getMessage());
-        }
-    }
-
     public Event getEventById(int id) {
         String query = "SELECT * FROM events WHERE id = ?";
         try (Connection connection = DatabaseConnector.getConnection();
@@ -109,27 +88,6 @@ public class EventRepository {
         }
     }
 
-    public List<Event> searchEventsByDate(String date) {
-        String query = "SELECT * FROM events WHERE date = ?";
-        List<Event> events = new ArrayList<>();
-
-        try (Connection connection = DatabaseConnector.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
-
-            statement.setDate(1, convertStringToSQLDate(date));
-
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    events.add(mapResultSetToEvent(resultSet));
-                }
-            }
-            System.out.println("Events retrieved successfully!");
-            return events;
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Error retrieving events: " + e.getMessage());
-        }
-    }
 
     public boolean deleteEvent(int id) {
         String query = "DELETE FROM events WHERE id = ?";

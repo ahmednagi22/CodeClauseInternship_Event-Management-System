@@ -5,6 +5,7 @@ import org.EventManagement.database.ScheduleRepository;
 import org.EventManagement.models.Schedule;
 import org.EventManagement.view.Dashboards.AdminDashboard;
 import org.EventManagement.view.Authentication.LoginFrame;
+import org.EventManagement.view.Dashboards.OrganizerDashboard;
 import org.EventManagement.view.add.AddSchedule;
 import org.EventManagement.view.edit.EditSchedule;
 
@@ -21,7 +22,9 @@ public class ManageSchedules extends JFrame {
     private final Dimension SIDEBAR_SIZE = new Dimension(200, 0);
     private final ScheduleController scheduleController;
     DefaultTableModel tableModel;
+    String title;
     public ManageSchedules(String title) {
+        this.title =title;
         setTitle("Event Management System | Manage Schedules | " + title + " Panel");
         setSize(950, 550);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -100,7 +103,14 @@ public class ManageSchedules extends JFrame {
     private void handleButtonClick(ActionEvent e) {
         String buttonText = e.getActionCommand();
         switch (buttonText) {
-            case "Dashboard" -> {this.dispose();new AdminDashboard().setVisible(true);}
+            case "Dashboard" -> {
+                switch (title) {
+                    case "Admin" -> new AdminDashboard().setVisible(true);
+                    case "Organizer" -> new OrganizerDashboard().setVisible(true);
+                }
+                this.dispose();
+
+            }
             // Handle Dashboard button click
             case "Add Schedule" -> {
                 AddSchedule addSchedule = new AddSchedule();

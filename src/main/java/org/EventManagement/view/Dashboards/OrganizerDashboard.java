@@ -1,5 +1,16 @@
 package org.EventManagement.view.Dashboards;
 
+import org.EventManagement.controller.AttendeeController;
+import org.EventManagement.controller.EventController;
+import org.EventManagement.controller.ScheduleController;
+import org.EventManagement.controller.UserController;
+import org.EventManagement.database.AttendeeRepository;
+import org.EventManagement.database.EventRepository;
+import org.EventManagement.database.ScheduleRepository;
+import org.EventManagement.database.UserRepository;
+import org.EventManagement.models.Attendee;
+import org.EventManagement.models.Event;
+import org.EventManagement.models.User;
 import org.EventManagement.view.Authentication.LoginFrame;
 import org.EventManagement.view.Utils.Utils;
 import org.EventManagement.view.manage.ManageAttendees;
@@ -9,6 +20,9 @@ import org.EventManagement.view.manage.ManageSchedules;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class OrganizerDashboard extends JFrame {
     private static final Color SIDEBAR_COLOR = new Color(44, 62, 80);
@@ -17,6 +31,10 @@ public class OrganizerDashboard extends JFrame {
     private static final Dimension SIDEBAR_SIZE = new Dimension(200, 0);
 
     public OrganizerDashboard() {
+
+        EventController eventController = new EventController(new EventRepository());
+        AttendeeController attendeeController = new AttendeeController(new AttendeeRepository());
+        UserController userController = new UserController(new UserRepository());
         setTitle("Event Management System | Organizer Panel");
         setSize(950, 550);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -39,19 +57,30 @@ public class OrganizerDashboard extends JFrame {
         for (String label : buttonLabels) {
             sidebar.add(createSidebarButton(label));
         }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate today = LocalDate.now();
+        List<Event> events = eventController.getAllEvents();
+        List<Attendee> attendees = attendeeController.getAllAttendees();
+        List<User> users = userController.getAllUsers();
+        long totalEvents = events.size();
+
+        long upcomingEvents = events.stream()
+                .filter(event -> LocalDate.parse(event.getDate(), formatter).isAfter(today))
+                .count();
+        long pastEvents = events.stream()
+                .filter(event -> LocalDate.parse(event.getDate(), formatter).isBefore(today)/* Add condition to check if event has passed */)
+                .count();
 
         // Main Dashboard Panel
         JPanel dashboardPanel = new JPanel(new GridLayout(2, 4, 15, 15));
         dashboardPanel.setBackground(Color.WHITE);
         dashboardPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        dashboardPanel.add(Utils.createCard("7", "Total Events", new Color(52, 152, 219)));
-        dashboardPanel.add(Utils.createCard("2", "Upcoming Events", new Color(243, 156, 18)));
-        dashboardPanel.add(Utils.createCard("2", "Total Users", new Color(231, 76, 60)));
-        dashboardPanel.add(Utils.createCard("2", "Total Bookings", new Color(243, 156, 18)));
-        dashboardPanel.add(Utils.createCard("0", "New Schedule", new Color(52, 152, 219)));
-        dashboardPanel.add(Utils.createCard("2", "Confirmed Bookings", new Color(46, 204, 113)));
-        dashboardPanel.add(Utils.createCard("0", "Cancelled Bookings", new Color(231, 76, 60)));
+        dashboardPanel.add(Utils.createCard(String.valueOf(totalEvents), "Total Events", new Color(52, 152, 219)));
+        dashboardPanel.add(Utils.createCard(String.valueOf(upcomingEvents), "Upcoming Events", new Color(243, 156, 18)));
+        dashboardPanel.add(Utils.createCard(String.valueOf(pastEvents), "Past Events", new Color(39, 174, 96)));
+        dashboardPanel.add(Utils.createCard(String.valueOf(attendees.size()), "Total Attendees", new Color(46, 204, 113)));
+        dashboardPanel.add(Utils.createCard(String.valueOf(users.size()), "Total Users", new Color(231, 76, 60)));
 
         add(sidebar, BorderLayout.WEST);
         add(dashboardPanel, BorderLayout.CENTER);
@@ -101,12 +130,4 @@ public class OrganizerDashboard extends JFrame {
         }
     }
 
-
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            AdminDashboard dashboard = new AdminDashboard();
-            dashboard.setVisible(true);
-        });
-    }
 }

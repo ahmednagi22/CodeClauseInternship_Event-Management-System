@@ -3,12 +3,15 @@ package org.EventManagement.view.Dashboards;
 import org.EventManagement.controller.AttendeeController;
 import org.EventManagement.controller.EventController;
 import org.EventManagement.controller.ScheduleController;
+import org.EventManagement.controller.UserController;
 import org.EventManagement.database.AttendeeRepository;
 import org.EventManagement.database.EventRepository;
 import org.EventManagement.database.ScheduleRepository;
+import org.EventManagement.database.UserRepository;
 import org.EventManagement.models.Attendee;
 import org.EventManagement.models.Event;
 import org.EventManagement.models.Schedule;
+import org.EventManagement.models.User;
 import org.EventManagement.view.Authentication.LoginFrame;
 import org.EventManagement.view.Utils.Utils;
 import org.EventManagement.view.add.AddAttendee;
@@ -18,6 +21,8 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,6 +40,7 @@ public class AttendeeDashboard extends JFrame {
     static String attendeeEmail ;
     public AttendeeDashboard(String email) {
         attendees = attendeeController.getAttendeesByEmail(email);
+        UserController userController = new UserController(new UserRepository());
         System.out.println(attendees.size());
         this.attendeeEmail = email;
         setTitle("Event Management System | Attendee Panel");
@@ -90,14 +96,29 @@ public class AttendeeDashboard extends JFrame {
                             event.getLocation(),
                             event.getDescription()});
         }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate today = LocalDate.now();
+        List<Attendee> attendees = attendeeController.getAllAttendees();
+        List<User> users = userController.getAllUsers();
+        long totalEvents = events.size();
+
+        long upcomingEvents = events.stream()
+                .filter(event -> LocalDate.parse(event.getDate(), formatter).isAfter(today))
+                .count();
+        long pastEvents = events.stream()
+                .filter(event -> LocalDate.parse(event.getDate(), formatter).isBefore(today)/* Add condition to check if event has passed */)
+                .count();
+
         // Cards Panel (Using GridLayout to align properly)
         JPanel cardsPanel = new JPanel(new GridLayout(1, 3, 10, 10)); // 1 Row, 3 Columns
         cardsPanel.setBackground(Color.WHITE);
         cardsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Padding
 
-        cardsPanel.add(Utils.createCard(events.size()+"", "Total Events", new Color(52, 152, 219)));
-        cardsPanel.add(Utils.createCard("2", "Upcoming Events", new Color(243, 156, 18)));
-        cardsPanel.add(Utils.createCard("2", "Total Bookings", new Color(39, 174, 96)));
+        dashboardPanel.add(Utils.createCard(String.valueOf(totalEvents), "Total Events", new Color(52, 152, 219)));
+        dashboardPanel.add(Utils.createCard(String.valueOf(upcomingEvents), "Upcoming Events", new Color(243, 156, 18)));
+        dashboardPanel.add(Utils.createCard(String.valueOf(pastEvents), "Past Events", new Color(39, 174, 96)));
+        dashboardPanel.add(Utils.createCard(String.valueOf(attendees.size()), "Total Attendees", new Color(46, 204, 113)));
+        dashboardPanel.add(Utils.createCard(String.valueOf(users.size()), "Total Users", new Color(231, 76, 60)));
 
         // Add components to dashboardPanel
         dashboardPanel.add(tablePanel, BorderLayout.CENTER);
@@ -151,19 +172,6 @@ public class AttendeeDashboard extends JFrame {
             JOptionPane.showMessageDialog(this,"You Logged Out");
         }
     }
-//    private void refreshTable(DefaultTableModel tableModel) {
-//        tableModel.setRowCount(0); // Clear existing data
-//        List<Event> events = eventController.getAllEvents();
-//        for (Event event : events) {
-//            tableModel.addRow(
-//                    new Object[]{
-//                            event.getId(),
-//                            event.getName(),
-//                            event.getDate(),
-//                            event.getLocation(),
-//                            event.getDescription()});
-//        }
-//    }
 
     private void createRegisterEventsTable() {
         tableModel.setRowCount(0);
@@ -201,10 +209,5 @@ public class AttendeeDashboard extends JFrame {
         System.out.println("Schedulessss");
         JOptionPane.showMessageDialog(this, scrollPane, "Event Schedules", JOptionPane.PLAIN_MESSAGE);
     }
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            AttendeeDashboard dashboard = new AttendeeDashboard(attendeeEmail);
-            dashboard.setVisible(true);
-        });
-    }
+
 }

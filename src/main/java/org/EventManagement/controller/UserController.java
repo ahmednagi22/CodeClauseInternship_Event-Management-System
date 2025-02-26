@@ -51,10 +51,7 @@ public class UserController {
     public List<User> getAllUsers(){
         return userRepository.getAllUsers();
     }
-//    public Boolean searchUsersByUsername(String username) {
-//        return userRepository.searchUsersByUsername(username);
 
-//    }
     public String hashPassword(String plainPassword) {
         return BCrypt.hashpw(plainPassword, BCrypt.gensalt());
     }

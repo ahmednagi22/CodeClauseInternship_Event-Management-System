@@ -1,5 +1,6 @@
 package org.EventManagement.view.Authentication;
 
+import com.mysql.cj.log.Log;
 import org.EventManagement.database.UserRepository;
 import org.EventManagement.controller.UserController;
 import org.EventManagement.view.Dashboards.AdminDashboard;
@@ -13,7 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class LoginFrame extends JFrame{
-    static LoginFrame loginFrame;
+
 
     private final JTextField emailField;
     private final JPasswordField passwordField;
@@ -112,7 +113,7 @@ public class LoginFrame extends JFrame{
                         case "Attendee" -> new AttendeeDashboard(email).setVisible(true);
                     }
                     }
-                    loginFrame.dispose();
+                    LoginFrame.this.dispose();
                 }
                 else{
                     JOptionPane.showMessageDialog(null, "Invalid Email or Password!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -120,17 +121,9 @@ public class LoginFrame extends JFrame{
             }
             else if (e.getSource() == signupButton) {
                 new SignupFrame().setVisible(true);
-                loginFrame.dispose();
+                LoginFrame.this.dispose();
             }
-
         }
     }
 
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            loginFrame = new LoginFrame();
-            loginFrame.setVisible(true);
-        });
-    }
 }

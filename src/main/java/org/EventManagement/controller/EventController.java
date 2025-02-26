@@ -24,12 +24,6 @@ public class EventController {
     public boolean deleteEvent(int id) {
         return eventRepository.deleteEvent(id);
     }
-    public List<Event> searchEventsByName(String name) {
-        return eventRepository.searchEventsByName(name);
-    }
-    public List<Event> searchEventsByDate(String date){
-        return eventRepository.searchEventsByDate(date);
-    }
     public Event getEventById(int id){
         return eventRepository.getEventById(id);
     }

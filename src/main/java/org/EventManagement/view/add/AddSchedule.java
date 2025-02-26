@@ -155,12 +155,4 @@ public class AddSchedule extends JFrame {
     private void showErrorDialog(String message) {
         JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
-
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            AddSchedule dashboard = new AddSchedule();
-            dashboard.setVisible(true);
-        });
-    }
 }

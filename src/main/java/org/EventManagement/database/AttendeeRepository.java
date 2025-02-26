@@ -98,49 +98,6 @@ public class AttendeeRepository {
         }
     }
 
-//    public List<Attendee> searchAttendeeByName(String name) {
-//        String query = "SELECT * FROM attendees WHERE name = ?";
-//        List<Attendee> attendees = new ArrayList<>();
-//
-//        try (Connection connection = DatabaseConnector.getConnection();
-//             PreparedStatement statement = connection.prepareStatement(query)) {
-//
-//            statement.setString(1, name);
-//            try (ResultSet resultSet = statement.executeQuery()) {
-//                while (resultSet.next()) {
-//                    attendees.add(mapResultSetToAttendee(resultSet));
-//                }
-//            }
-//            System.out.println("Attendees retrieved successfully!");
-//            return attendees;
-//
-//        } catch (SQLException e) {
-//            throw new RuntimeException("Error retrieving attendees: " + e.getMessage());
-//        }
-//    }
-
-//    public List<Attendee> getAttendeesByEvent(int eventId) {
-//        String query = "SELECT * FROM attendees WHERE event_id = ?";
-//        List<Attendee> attendees = new ArrayList<>();
-//
-//        try (Connection connection = DatabaseConnector.getConnection();
-//             PreparedStatement statement = connection.prepareStatement(query)) {
-//
-//            statement.setInt(1, eventId);
-//
-//            try (ResultSet resultSet = statement.executeQuery()) {
-//                while (resultSet.next()) {
-//                    attendees.add(mapResultSetToAttendee(resultSet));
-//                }
-//            }
-//            System.out.println("Attendees retrieved successfully!");
-//            return attendees;
-//
-//        } catch (SQLException e) {
-//            throw new RuntimeException("Error retrieving attendees: " + e.getMessage());
-//        }
-//    }
-
     public Attendee getAttendeeById(int id) {
         String query = "SELECT * FROM attendees WHERE id = ?";
         try (Connection connection = DatabaseConnector.getConnection();
