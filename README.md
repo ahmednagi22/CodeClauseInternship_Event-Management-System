@@ -30,11 +30,13 @@ The **Event Management System** is a Java-based desktop application that allows 
 - **Maven** - Build automation
 
 ## 📸 Screenshots
-(Add relevant screenshots here)
-![Screenshot 2![Screenshot 2025-02-27 000338](https://github.com/user-attachments/assets/ac2460d2-6b5f-42e8-af01-a56ed11c9a7b)
-025-02-27 000326](https://github.com/user-atta![Screenshot 2025-02-27 000309](https://github.com/user-attachments/assets/c1e7705d-0f37-4130-a88a-96287e7d048d)
-chments/assets/afe27bb1-591b-415d-bfcb-68f33a1f![Screenshot 2025-02-27 000252](https://github.com/user-attachments/assets/2a68965e-4956-4b03-936f-0c387d605794)
-35e7)
+![Screenshot 2025-02-27 000326](https://github.com/user-attachments/assets/fe923a22-092c-4211-81a0-9dc57ea5b60a)
+
+![Screenshot 2025-02-27 000338](https://github.com/user-attachments/assets/bbb6aa13-6534-458b-91e5-0f81c6fe57c8)
+
+![Screenshot 2025-02-27 000309](https://github.com/user-attachments/assets/77b565dd-8e9f-4ca0-8708-6c94e22da5ee)
+
+![Screenshot 2025-02-27 000252](https://github.com/user-attachments/assets/f9911579-1ff0-4f77-8ed4-dc211e543a7b)
 
 
 ## 🤝 Acknowledgments
