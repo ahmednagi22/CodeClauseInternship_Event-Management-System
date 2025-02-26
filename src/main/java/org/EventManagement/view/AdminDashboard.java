@@ -27,7 +27,7 @@ public class AdminDashboard extends JFrame {
         // Sidebar Buttons
         String[] buttonLabels = {
                 "Dashboard", "Manage Attendees", "Manage Events",
-                "Manage Schedule", "Manage Users", "Logout"
+                "Manage Schedules", "Manage Users", "Logout"
         };
 
         for (String label : buttonLabels) {
@@ -77,15 +77,16 @@ public class AdminDashboard extends JFrame {
     private void handleButtonClick(ActionEvent e) {
         String buttonText = e.getActionCommand();
         if (buttonText.equals("Dashboard")) {
-            System.out.println("dashhhhboard");
             // Handle Dashboard button click
         } else if (buttonText.equals("Manage Attendees")) {
-            // Handle Manage Attendees button click
+            this.dispose();
+            new ManageAttendees().setVisible(true);
         } else if (buttonText.equals("Manage Events")) {
             this.dispose();
             new ManageEvents().setVisible(true);
-        } else if (buttonText.equals("Manage Schedule")) {
-            // Handle Manage Schedule button click
+        } else if (buttonText.equals("Manage Schedules")) {
+            this.dispose();
+            new ManageSchedules().setVisible(true);
         } else if (buttonText.equals("Manage Users")) {
             this.dispose();
             new ManageUsers().setVisible(true);

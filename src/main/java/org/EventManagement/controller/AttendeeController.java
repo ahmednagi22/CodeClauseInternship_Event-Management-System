@@ -12,20 +12,21 @@ public class AttendeeController {
     public AttendeeController(AttendeeRepository attendeeRepository) {
         this.attendeeRepository = attendeeRepository;
     }
-    public void addAttendee(Attendee attendee){
-        attendeeRepository.addAttendee(attendee);
+    public boolean addAttendee(Attendee attendee){
+        return attendeeRepository.addAttendee(attendee);
     }
-    public void updateAttendee(Attendee attendee) {
-        attendeeRepository.updateAttendee(attendee);
+    public boolean updateAttendee(Attendee attendee) {
+        return attendeeRepository.updateAttendee(attendee);
     }
-    public void deleteAttendee(int id) {
-        attendeeRepository.deleteAttendee(id);
+
+    public boolean deleteAttendee(int id) {
+        return attendeeRepository.deleteAttendee(id);
     }
     public List<Attendee> getAllAttendees(){
         return attendeeRepository.getAllAttendees();
     }
-    public List<Attendee> searchAttendeeByName(String name) {
-        return attendeeRepository.searchAttendeeByName(name);
+    public Attendee getAttendeeById(int id) {
+        return attendeeRepository.getAttendeeById(id);
     }
     public List<Attendee> getAttendeesByEvent(int eventId){
             return null;

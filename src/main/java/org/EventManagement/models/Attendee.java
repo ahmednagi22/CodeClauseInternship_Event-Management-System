@@ -18,6 +18,13 @@ public class Attendee {
         this.eventId = eventId;
     }
 
+    public Attendee(String name, String email, String phone, int eventId) {
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.eventId = eventId;
+    }
+
     public int getId() {
         return id;
     }

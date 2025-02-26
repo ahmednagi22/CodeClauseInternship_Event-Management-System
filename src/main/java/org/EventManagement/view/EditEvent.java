@@ -169,4 +169,5 @@ public class EditEvent extends JFrame {
                 JOptionPane.ERROR_MESSAGE
         );
     }
+
 }
