@@ -1,7 +1,11 @@
-package org.EventManagement.view;
+package org.EventManagement.view.Authentication;
 
 import org.EventManagement.database.UserRepository;
 import org.EventManagement.controller.UserController;
+import org.EventManagement.view.Dashboards.AdminDashboard;
+import org.EventManagement.view.Dashboards.AttendeeDashboard;
+import org.EventManagement.view.Dashboards.OrganizerDashboard;
+import org.EventManagement.view.Utils.GradientPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -104,8 +108,8 @@ public class LoginFrame extends JFrame{
                     if(role != null){
                         switch (role) {
                         case "Admin" -> new AdminDashboard().setVisible(true);
-                        //case "organizer" -> new OrganizerDashboard().setVisible(true);
-                        case "Attendee" -> new AttendeeDashboard().setVisible(true);
+                        case "Organizer" -> new OrganizerDashboard().setVisible(true);
+                        case "Attendee" -> new AttendeeDashboard(email).setVisible(true);
                     }
                     }
                     loginFrame.dispose();

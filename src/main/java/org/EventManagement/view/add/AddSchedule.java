@@ -1,4 +1,4 @@
-package org.EventManagement.view;
+package org.EventManagement.view.add;
 
 import org.EventManagement.controller.EventController;
 import org.EventManagement.controller.ScheduleController;
@@ -6,6 +6,7 @@ import org.EventManagement.database.EventRepository;
 import org.EventManagement.database.ScheduleRepository;
 import org.EventManagement.models.Event;
 import org.EventManagement.models.Schedule;
+import org.EventManagement.view.Utils.GradientPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,7 +14,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 

@@ -1,10 +1,6 @@
 package org.EventManagement;
 
 
-import org.EventManagement.models.User;
-import org.EventManagement.view.EditUser;
-import org.EventManagement.view.ManageUsers;
-
 public class Main {
     public static void main(String[] args) {
 //        AttendeeRepository attendeeRepository = new AttendeeRepository();

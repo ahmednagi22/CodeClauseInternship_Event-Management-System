@@ -15,7 +15,7 @@ public class UserController {
         this.userRepository = userRepository;
     }
     public boolean authenticateUser(String email, String password){
-        User user = userRepository.findByEmail(email);
+        User user = userRepository.getUserByEmail(email);
 
         if(user == null){
             return false;
@@ -44,6 +44,10 @@ public class UserController {
     public User getUserById(int userId){
         return userRepository.getUserById(userId);
     }
+    public User getUserByEmail(String email){
+        return userRepository.getUserByEmail(email);
+    }
+
     public List<User> getAllUsers(){
         return userRepository.getAllUsers();
     }

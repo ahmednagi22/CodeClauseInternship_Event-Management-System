@@ -1,21 +1,42 @@
-package org.EventManagement.view;
+package org.EventManagement.view.Dashboards;
 
+import org.EventManagement.controller.AttendeeController;
 import org.EventManagement.controller.EventController;
+import org.EventManagement.controller.ScheduleController;
+import org.EventManagement.database.AttendeeRepository;
 import org.EventManagement.database.EventRepository;
+import org.EventManagement.database.ScheduleRepository;
+import org.EventManagement.models.Attendee;
 import org.EventManagement.models.Event;
+import org.EventManagement.models.Schedule;
+import org.EventManagement.view.Authentication.LoginFrame;
+import org.EventManagement.view.Utils.Utils;
+import org.EventManagement.view.add.AddAttendee;
+import org.EventManagement.view.add.Register;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AttendeeDashboard extends JFrame {
     private static final Color SIDEBAR_COLOR = new Color(44, 62, 80);
     private static final Color BUTTON_COLOR = new Color(52, 73, 94);
     private static final Color BUTTON_HOVER_COLOR = new Color(67, 92, 115);
     private static final Dimension SIDEBAR_SIZE = new Dimension(200, 0);
+    DefaultTableModel tableModel;
+    JTable table;
     EventController eventController = new EventController(new EventRepository());
-    public AttendeeDashboard() {
+    AttendeeController attendeeController = new AttendeeController(new AttendeeRepository());
+    ScheduleController scheduleController = new ScheduleController(new ScheduleRepository());
+    List<Attendee> attendees;
+    static String attendeeEmail ;
+    public AttendeeDashboard(String email) {
+        attendees = attendeeController.getAttendeesByEmail(email);
+        System.out.println(attendees.size());
+        this.attendeeEmail = email;
         setTitle("Event Management System | Attendee Panel");
         setSize(950, 550);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -31,11 +52,12 @@ public class AttendeeDashboard extends JFrame {
 
         // Sidebar Buttons
         String[] buttonLabels = {
-                "Dashboard",
-                "Browse Events",
+                "View Events",
+                "Register",
                 "My Events",
-                "Schedule",
-                "Profile Settings",
+                "View Schedules",
+                "Edit Profile",
+                "Cancel Registration",
                 "Logout"
         };
         for (String label : buttonLabels) {
@@ -51,10 +73,8 @@ public class AttendeeDashboard extends JFrame {
         JPanel tablePanel = new JPanel(new BorderLayout());
         String[] columns = {"ID", "Name","Date", "Location","Description"};
 
-        //data = eventController.getAllEvents();
-
-        DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
-        JTable table = new JTable(tableModel);
+        tableModel = new DefaultTableModel(columns, 0);
+        table = new JTable(tableModel);
 
         JScrollPane scrollPane = new JScrollPane(table);
         tablePanel.add(scrollPane, BorderLayout.CENTER);
@@ -115,40 +135,75 @@ public class AttendeeDashboard extends JFrame {
     }
     private void handleButtonClick(ActionEvent e) {
         String buttonText = e.getActionCommand();
-        if (buttonText.equals("Dashboard")) {
-            new AttendeeDashboard().setVisible(true);
+        if (buttonText.equals("View Events")) {
+            new AttendeeDashboard(attendeeEmail).setVisible(true);
             dispose();
-            // Handle Dashboard button click
-        } else if (buttonText.equals("Manage Attendees")) {
-            // Handle Manage Attendees button click
-        } else if (buttonText.equals("Browse Events")) {
-            // Handle Manage Events button click
-        } else if (buttonText.equals("Schedule")) {
-            // Handle Manage Schedule button click
-        } else if (buttonText.equals("Profile Settings")) {
-            // Handle Manage Users button click
-        } else if (buttonText.equals("Logout")) {
+        } else if (buttonText.equals("Register")) {
+            new Register(attendeeEmail).setVisible(true);
+        } else if (buttonText.equals("My Events")) {
+            createRegisterEventsTable();
+        } else if (buttonText.equals("View Schedules")) {
+            createRegisterSchedulesTable();
+        }
+        else if (buttonText.equals("Logout")) {
             this.dispose();
             new LoginFrame().setVisible(true);
             JOptionPane.showMessageDialog(this,"You Logged Out");
         }
     }
-    private void refreshTable(DefaultTableModel tableModel) {
-        tableModel.setRowCount(0); // Clear existing data
-        List<Event> events = eventController.getAllEvents();
-        for (Event event : events) {
-            tableModel.addRow(
-                    new Object[]{
-                            event.getId(),
-                            event.getName(),
-                            event.getDate(),
-                            event.getLocation(),
-                            event.getDescription()});
+//    private void refreshTable(DefaultTableModel tableModel) {
+//        tableModel.setRowCount(0); // Clear existing data
+//        List<Event> events = eventController.getAllEvents();
+//        for (Event event : events) {
+//            tableModel.addRow(
+//                    new Object[]{
+//                            event.getId(),
+//                            event.getName(),
+//                            event.getDate(),
+//                            event.getLocation(),
+//                            event.getDescription()});
+//        }
+//    }
+
+    private void createRegisterEventsTable() {
+        tableModel.setRowCount(0);
+
+        for (Attendee attendee : attendees) {
+            Event event = eventController.getEventById(attendee.getEventId());
+            if (event != null) {
+                tableModel.addRow(new Object[]{
+                        event.getId(),
+                        event.getName(),
+                        event.getDate(),
+                        event.getLocation(),
+                        event.getDescription()
+                });
+            }
         }
+    }
+
+    private void createRegisterSchedulesTable() {
+        String[] columns = {"ID", "Event Name","Activity", "Start Time","End Time"};
+        DefaultTableModel model = new DefaultTableModel(columns, 0);
+        List<Schedule> schedules = scheduleController.getAllSchedules();
+        for (Schedule schedule : schedules) {
+            Event event = eventController.getEventById(schedule.getEventId());
+            model.addRow(new Object[]{
+                    schedule.getEventId(),
+                    event.getName(),
+                    schedule.getActivity(),
+                    schedule.getStartTime(),
+                    schedule.getEndTime()
+            });
+        }
+        JTable table = new JTable(model);
+        JScrollPane scrollPane = new JScrollPane(table);
+        System.out.println("Schedulessss");
+        JOptionPane.showMessageDialog(this, scrollPane, "Event Schedules", JOptionPane.PLAIN_MESSAGE);
     }
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            AttendeeDashboard dashboard = new AttendeeDashboard();
+            AttendeeDashboard dashboard = new AttendeeDashboard(attendeeEmail);
             dashboard.setVisible(true);
         });
     }

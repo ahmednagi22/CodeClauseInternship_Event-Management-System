@@ -1,8 +1,7 @@
-package org.EventManagement.view;
+package org.EventManagement.view.Utils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 
 public  class Utils {
     public static JPanel createCard(String number, String title, Color color) {

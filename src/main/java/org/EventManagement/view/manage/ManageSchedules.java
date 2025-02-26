@@ -1,12 +1,12 @@
-package org.EventManagement.view;
+package org.EventManagement.view.manage;
 
-import org.EventManagement.controller.AttendeeController;
-import org.EventManagement.controller.UserController;
-import org.EventManagement.database.AttendeeRepository;
-import org.EventManagement.database.UserRepository;
-import org.EventManagement.models.Attendee;
-import org.EventManagement.models.Event;
-import org.EventManagement.models.User;
+import org.EventManagement.controller.ScheduleController;
+import org.EventManagement.database.ScheduleRepository;
+import org.EventManagement.models.Schedule;
+import org.EventManagement.view.Dashboards.AdminDashboard;
+import org.EventManagement.view.Authentication.LoginFrame;
+import org.EventManagement.view.add.AddSchedule;
+import org.EventManagement.view.edit.EditSchedule;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -14,22 +14,22 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
-public class ManageAttendees extends JFrame {
+public class ManageSchedules extends JFrame {
     private final Color SIDEBAR_COLOR = new Color(44, 62, 80);
     private final Color BUTTON_COLOR = new Color(52, 73, 94);
     private final Color BUTTON_HOVER_COLOR = new Color(67, 92, 115);
     private final Dimension SIDEBAR_SIZE = new Dimension(200, 0);
-    private final AttendeeController attendeeController;
+    private final ScheduleController scheduleController;
     DefaultTableModel tableModel;
-    public ManageAttendees() {
-        setTitle("Event Management System | Manage Attendees | Admin Panel");
+    public ManageSchedules(String title) {
+        setTitle("Event Management System | Manage Schedules | " + title + " Panel");
         setSize(950, 550);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
         setResizable(false);
 
-        attendeeController =new AttendeeController(new AttendeeRepository());
+        scheduleController =new ScheduleController(new ScheduleRepository());
         // Main Dashboard Panel
         JPanel dashboardPanel = new JPanel();
         dashboardPanel.setLayout(new BorderLayout());
@@ -37,7 +37,7 @@ public class ManageAttendees extends JFrame {
 
         // Table Panel
         JPanel tablePanel = new JPanel(new BorderLayout());
-        String[] columns = {"ID", "Name","Email", "Event Id"};
+        String[] columns = {"ID", "Event ID","Activity", "Start Time", "End Time"};
 
         tableModel = new DefaultTableModel(columns, 0){
             @Override
@@ -55,10 +55,6 @@ public class ManageAttendees extends JFrame {
         // Add components to dashboardPanel
         dashboardPanel.add(tablePanel, BorderLayout.CENTER);
 
-
-        // Add components to frame
-
-
         // Sidebar Panel
         JPanel sidebar = new JPanel();
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
@@ -67,8 +63,8 @@ public class ManageAttendees extends JFrame {
 
         // Sidebar Buttons
         String[] buttonLabels = {
-                "Dashboard", "Add Attendee", "Edit Attendee",
-                "Remove Attendee", "Logout"
+                "Dashboard", "Add Schedule", "Edit Schedule",
+                "Remove Schedule", "Logout"
         };
 
         for (String label : buttonLabels) {
@@ -106,27 +102,26 @@ public class ManageAttendees extends JFrame {
         switch (buttonText) {
             case "Dashboard" -> {this.dispose();new AdminDashboard().setVisible(true);}
             // Handle Dashboard button click
-            case "Add Attendee" -> {
-                AddAttendee addAttendee = new AddAttendee();
-                addAttendee.setVisible(true);
-                addAttendee.addWindowListener(new java.awt.event.WindowAdapter() {
+            case "Add Schedule" -> {
+                AddSchedule addSchedule = new AddSchedule();
+                addSchedule.setVisible(true);
+                addSchedule.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosed(java.awt.event.WindowEvent e) {
                         refreshTableData();
-
                     }
                 });
             }
-            case "Edit Attendee" -> {
-                String  idStr = JOptionPane.showInputDialog(this,"Enter Attendee ID to Edit:");
+            case "Edit Schedule" -> {
+                String  idStr = JOptionPane.showInputDialog(this,"Enter Schedule ID to Edit:");
                 // validate input as Integer
                 if(idStr != null && idStr.matches("\\d+")){
-                    int attendeeId = Integer.parseInt(idStr);
-                    Attendee attendee = attendeeController.getAttendeeById(attendeeId);
-                    if(attendee != null){
-                        EditAttendee editAttendee = new EditAttendee(attendee);
-                        editAttendee.setVisible(true);
-                        editAttendee.addWindowListener(new java.awt.event.WindowAdapter() {
+                    int scheduleId = Integer.parseInt(idStr);
+                    Schedule schedule = scheduleController.getScheduleById(scheduleId);
+                    if(schedule != null){
+                        EditSchedule editSchedule = new EditSchedule(schedule);
+                        editSchedule.setVisible(true);
+                        editSchedule.addWindowListener(new java.awt.event.WindowAdapter() {
                             @Override
                             public void windowClosed(java.awt.event.WindowEvent e) {
                                 refreshTableData();
@@ -141,18 +136,18 @@ public class ManageAttendees extends JFrame {
                     JOptionPane.showMessageDialog(this, "Invalid ID!", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
-            case "Remove Attendee" -> {
-                String  idStr = JOptionPane.showInputDialog(this,"Enter Attendee ID to Remove:");
+            case "Remove Schedule" -> {
+                String  idStr = JOptionPane.showInputDialog(this,"Enter Schedule ID to Remove:");
                 if(idStr != null && idStr.matches("\\d+")){
-                    int attendeeId = Integer.parseInt(idStr);
+                    int scheduleId = Integer.parseInt(idStr);
 
-                    if(attendeeController.deleteAttendee(attendeeId)){
-                        JOptionPane.showMessageDialog(this, "Attendee Deleted Successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    if(scheduleController.deleteSchedule(scheduleId)){
+                        JOptionPane.showMessageDialog(this, "Schedule Deleted Successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                         refreshTableData();
 
                     }
                     else{
-                        JOptionPane.showMessageDialog(this, "Attendee Not Found!!!", "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(this, "Schedule Not Found!!!", "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
                 else{
@@ -172,17 +167,17 @@ public class ManageAttendees extends JFrame {
         // Clear existing rows
         tableModel.setRowCount(0);
         // Fetch updated list of users
-        List<Attendee> attendees = attendeeController.getAllAttendees();
-        System.out.println("Fetched " + attendees.size() + " attendees"); // Debug statement
+        List<Schedule> schedules = scheduleController.getAllSchedules();
+        System.out.println("Fetched " + schedules.size() + " attendees"); // Debug statement
         // Repopulate the table
-        for (Attendee attendee : attendees) {
+        for (Schedule schedule : schedules) {
             tableModel.addRow(
                     new Object[]{
-                            attendee.getId(),
-                            attendee.getName(),
-                            attendee.getEmail(),
-                            attendee.getPhone(),
-                            attendee.getEventId()
+                            schedule.getId(),
+                            schedule.getEventId(),
+                            schedule.getActivity(),
+                            schedule.getStartTime(),
+                            schedule.getEndTime()
                     }
             );
         }

@@ -1,9 +1,10 @@
-package org.EventManagement.view;
+package org.EventManagement.view.edit;
 
 import com.toedter.calendar.JDateChooser;
 import org.EventManagement.controller.EventController;
 import org.EventManagement.database.EventRepository;
 import org.EventManagement.models.Event;
+import org.EventManagement.view.Utils.GradientPanel;
 
 import javax.swing.*;
 import java.awt.*;

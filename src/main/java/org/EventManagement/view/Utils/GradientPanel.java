@@ -1,4 +1,4 @@
-package org.EventManagement.view;
+package org.EventManagement.view.Utils;
 
 import java.awt.*;
 import javax.swing.*;

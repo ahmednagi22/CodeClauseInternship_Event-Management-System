@@ -28,8 +28,8 @@ public class AttendeeController {
     public Attendee getAttendeeById(int id) {
         return attendeeRepository.getAttendeeById(id);
     }
-    public List<Attendee> getAttendeesByEmail(String email){
-        return attendeeRepository.getAttendeesByEmail(email);
+    public List<Attendee> getAttendeesByEvent(int eventId){
+            return null;
     }
 
 }

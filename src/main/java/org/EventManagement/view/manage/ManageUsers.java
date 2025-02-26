@@ -1,35 +1,37 @@
-package org.EventManagement.view;
+package org.EventManagement.view.manage;
 
-import org.EventManagement.controller.EventController;
-import org.EventManagement.database.EventRepository;
-import org.EventManagement.models.Event;
+import org.EventManagement.controller.UserController;
+import org.EventManagement.database.UserRepository;
+import org.EventManagement.models.User;
+import org.EventManagement.view.Dashboards.AdminDashboard;
+import org.EventManagement.view.Authentication.LoginFrame;
+import org.EventManagement.view.Utils.Utils;
+import org.EventManagement.view.add.AddUser;
+import org.EventManagement.view.edit.EditUser;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 
-public class ManageEvents extends JFrame {
+public class ManageUsers extends JFrame {
     private final Color SIDEBAR_COLOR = new Color(44, 62, 80);
     private final Color BUTTON_COLOR = new Color(52, 73, 94);
     private final Color BUTTON_HOVER_COLOR = new Color(67, 92, 115);
     private final Dimension SIDEBAR_SIZE = new Dimension(200, 0);
-    private final EventController eventController;
+    private final UserController userController;
     DefaultTableModel tableModel;
     private final JPanel cardsPanel;
-    public ManageEvents() {
-        setTitle("Event Management System | Manage Events | Admin Panel");
+    public ManageUsers(String title) {
+        setTitle("Event Management System | Manage Users | "+title+" Panel");
         setSize(950, 550);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
         setResizable(false);
 
-        eventController =new EventController(new EventRepository());
+        userController =new UserController(new UserRepository());
         // Main Dashboard Panel
         JPanel dashboardPanel = new JPanel();
         dashboardPanel.setLayout(new BorderLayout());
@@ -37,7 +39,7 @@ public class ManageEvents extends JFrame {
 
         // Table Panel
         JPanel tablePanel = new JPanel(new BorderLayout());
-        String[] columns = {"ID", "Event Name","Date","Location", "Description"};
+        String[] columns = {"ID", "First Name","Last Name","Email", "Role"};
 
         tableModel = new DefaultTableModel(columns, 0){
             @Override
@@ -71,8 +73,8 @@ public class ManageEvents extends JFrame {
 
         // Sidebar Buttons
         String[] buttonLabels = {
-                "Dashboard", "Add Event", "Edit Event",
-                "Remove Event", "Logout"
+                "Dashboard", "Add User", "Edit User",
+                "Remove User", "Logout"
         };
 
         for (String label : buttonLabels) {
@@ -101,7 +103,7 @@ public class ManageEvents extends JFrame {
             }
 
         });
-        button.addActionListener(this::handleButtonClick);
+        button.addActionListener(e -> handleButtonClick(e));
         return button;
     }
 
@@ -110,10 +112,10 @@ public class ManageEvents extends JFrame {
         switch (buttonText) {
             case "Dashboard" -> {this.dispose();new AdminDashboard().setVisible(true);}
             // Handle Dashboard button click
-            case "Add Event" -> {
-                AddEvent addEvent = new AddEvent();
-                addEvent.setVisible(true);
-                addEvent.addWindowListener(new java.awt.event.WindowAdapter() {
+            case "Add User" -> {
+                AddUser addUser = new AddUser();
+                addUser.setVisible(true);
+                addUser.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosed(java.awt.event.WindowEvent e) {
                         refreshTableData();
@@ -121,16 +123,16 @@ public class ManageEvents extends JFrame {
                     }
                 });
             }
-            case "Edit Event" -> {
-                String  idStr = JOptionPane.showInputDialog(this,"Enter Event ID to Edit:");
+            case "Edit User" -> {
+                String  idStr = JOptionPane.showInputDialog(this,"Enter User ID to Edit:");
                 // validate input as Integer
                 if(idStr != null && idStr.matches("\\d+")){
-                    int eventId = Integer.parseInt(idStr);
-                    Event event = eventController.getEventById(eventId);
-                    if(event != null){
-                        EditEvent editEvent = new EditEvent(event);
-                        editEvent.setVisible(true);
-                        editEvent.addWindowListener(new java.awt.event.WindowAdapter() {
+                    int userId = Integer.parseInt(idStr);
+                    User user = userController.getUserById(userId);
+                    if(user != null){
+                        EditUser editUser = new EditUser(user);
+                        editUser.setVisible(true);
+                        editUser.addWindowListener(new java.awt.event.WindowAdapter() {
                             @Override
                             public void windowClosed(java.awt.event.WindowEvent e) {
                                 refreshTableData();
@@ -139,25 +141,25 @@ public class ManageEvents extends JFrame {
                         });
                     }
                     else{
-                        JOptionPane.showMessageDialog(this, "Event not found!", "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(this, "User not found!", "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
                 else{
                     JOptionPane.showMessageDialog(this, "Invalid ID!", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
-            case "Remove Event" -> {
-                String  idStr = JOptionPane.showInputDialog(this,"Enter Event ID to Remove:");
+            case "Remove User" -> {
+                String  idStr = JOptionPane.showInputDialog(this,"Enter User ID to Remove:");
                 if(idStr != null && idStr.matches("\\d+")){
-                    int eventId = Integer.parseInt(idStr);
+                    int userId = Integer.parseInt(idStr);
 
-                    if(eventController.deleteEvent(eventId)){
-                        JOptionPane.showMessageDialog(this, "Event Deleted Successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    if(userController.deleteUser(userId)){
+                        JOptionPane.showMessageDialog(this, "User Deleted Successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                         refreshTableData();
                         updateCardsData();
                     }
                     else{
-                        JOptionPane.showMessageDialog(this, "Event Not Found!!!", "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(this, "User Not Found!!!", "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
                 else{
@@ -175,42 +177,33 @@ public class ManageEvents extends JFrame {
         // Clear existing rows
         tableModel.setRowCount(0);
         // Fetch updated list of users
-        List<Event> events = eventController.getAllEvents();
-        System.out.println("Fetched " + events.size() + " users"); // Debug statement
+        List<User> users = userController.getAllUsers();
+        System.out.println("Fetched " + users.size() + " users"); // Debug statement
         // Repopulate the table
-        for (Event event : events) {
+        for (User user : users) {
             tableModel.addRow(
                     new Object[]{
-                            event.getId(),
-                            event.getName(),
-                            event.getDate(),
-                            event.getLocation(),
-                            event.getDescription()
+                            user.getId(),
+                            user.getFirstName(),
+                            user.getLastName(),
+                            user.getEmail(),
+                            user.getRole()
                     }
             );
         }
     }
     private void updateCardsData() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate today = LocalDate.now();
-
-        List<Event> events = eventController.getAllEvents();
-        long totalEvents = events.size();
-
-        long upcomingEvents = events.stream()
-                .filter(event -> LocalDate.parse(event.getDate(), formatter).isAfter(today))
-                .count();
-        long pastEvents = events.stream()
-                .filter(event -> LocalDate.parse(event.getDate(), formatter).isBefore(today)/* Add condition to check if event has passed */)
-                .count();
+        long adminCount = userController.getAllUsers().stream().filter(user -> "Admin".equals(user.getRole())).count();
+        long organizerCount = userController.getAllUsers().stream().filter(user -> "Organizer".equals(user.getRole())).count();
+        long attendeeCount = userController.getAllUsers().stream().filter(user -> "Attendee".equals(user.getRole())).count();
 
         // Remove old components
         cardsPanel.removeAll();
 
-        // Add updated event statistics cards
-        cardsPanel.add(Utils.createCard(String.valueOf(totalEvents), "Total Events", new Color(243, 156, 18)));
-        cardsPanel.add(Utils.createCard(String.valueOf(upcomingEvents), "Upcoming Events", new Color(52, 152, 219)));
-        cardsPanel.add(Utils.createCard(String.valueOf(pastEvents), "Past Events", new Color(39, 174, 96)));
+        // Add updated cards
+        cardsPanel.add(Utils.createCard(String.valueOf(adminCount), "Total Admins", new Color(243, 156, 18)));
+        cardsPanel.add(Utils.createCard(String.valueOf(organizerCount), "Total Organizers", new Color(52, 152, 219)));
+        cardsPanel.add(Utils.createCard(String.valueOf(attendeeCount), "Total Attendees", new Color(39, 174, 96)));
 
         // Refresh the UI
         cardsPanel.revalidate();

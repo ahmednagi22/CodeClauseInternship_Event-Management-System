@@ -1,59 +1,62 @@
-package org.EventManagement.view;
+package org.EventManagement.view.add;
 
 import org.EventManagement.controller.AttendeeController;
 import org.EventManagement.controller.EventController;
+import org.EventManagement.controller.UserController;
 import org.EventManagement.database.AttendeeRepository;
 import org.EventManagement.database.EventRepository;
+import org.EventManagement.database.UserRepository;
 import org.EventManagement.models.Attendee;
 import org.EventManagement.models.Event;
+import org.EventManagement.models.User;
+import org.EventManagement.view.Utils.GradientPanel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
-
-public class EditAttendee extends JFrame {
+public class Register extends JFrame {
     private final JTextField nameField;
     private final JTextField emailField;
     private final JTextField phone;
     private final JComboBox<Integer> eventId;
     private final AttendeeController attendeeController;
     private final EventController eventController;
-    private final Attendee attendee;
-
-    public EditAttendee(Attendee attendee) {
-        this.attendee = attendee;
-        attendeeController = new AttendeeController(new AttendeeRepository());
+    private final UserController userController;
+    public Register(String userEmail) {
+        attendeeController = new AttendeeController(new AttendeeRepository()); // service initialization
         eventController = new EventController(new EventRepository());
+        userController = new UserController(new UserRepository());
+        User user = userController.getUserByEmail(userEmail);
         List<Event> events = eventController.getAllEvents();
-
-        setTitle("Edit Attendee");
+        setTitle("Register");
         setSize(400, 500);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
-        setUndecorated(true);
+        setUndecorated(true); // Remove header
 
         GradientPanel panel = new GradientPanel();
         panel.setLayout(null);
 
-        JLabel titleLabel = new JLabel("Edit Attendee");
+        JLabel titleLabel = new JLabel("Register");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         titleLabel.setForeground(Color.WHITE);
-        titleLabel.setBounds(120, 20, 200, 40);
+        titleLabel.setBounds(140, 20, 200, 40);
         panel.add(titleLabel);
 
-        JLabel nameLabel = new JLabel("Name");
-        nameLabel.setForeground(Color.WHITE);
-        nameLabel.setBounds(50, 70, 100, 20);
-        panel.add(nameLabel);
+        JLabel nameFieldLabel = new JLabel("Name");
+        nameFieldLabel.setForeground(Color.WHITE);
+        nameFieldLabel.setBounds(50, 70, 100, 20);
+        panel.add(nameFieldLabel);
 
-        nameField = new JTextField(attendee.getName());
+        nameField = new JTextField(15);
         nameField.setBounds(50, 95, 300, 35);
         nameField.setBackground(Color.LIGHT_GRAY);
         nameField.setFont(new Font("Arial", Font.PLAIN, 16));
         nameField.setBorder(null);
+        nameField.setText(user.getFirstName()+" "+user.getLastName());
         panel.add(nameField);
 
         JLabel emailLabel = new JLabel("Email");
@@ -61,11 +64,13 @@ public class EditAttendee extends JFrame {
         emailLabel.setBounds(50, 145, 100, 20);
         panel.add(emailLabel);
 
-        emailField = new JTextField(attendee.getEmail());
+        emailField = new JTextField(15);
         emailField.setBounds(50, 170, 300, 35);
         emailField.setBackground(Color.LIGHT_GRAY);
         emailField.setFont(new Font("Arial", Font.PLAIN, 16));
         emailField.setBorder(null);
+        emailField.setText(user.getEmail());
+        emailField.setEditable(false);
         panel.add(emailField);
 
         JLabel phoneLabel = new JLabel("Phone");
@@ -73,7 +78,7 @@ public class EditAttendee extends JFrame {
         phoneLabel.setBounds(50, 220, 100, 20);
         panel.add(phoneLabel);
 
-        phone = new JTextField(attendee.getPhone());
+        phone = new JTextField(15);
         phone.setBounds(50, 245, 300, 35);
         phone.setBackground(Color.LIGHT_GRAY);
         phone.setFont(new Font("Arial", Font.PLAIN, 16));
@@ -86,10 +91,10 @@ public class EditAttendee extends JFrame {
         panel.add(eventIdLabel);
 
         eventId = new JComboBox<>();
-        for (Event event : events) {
+        for(Event event:events){
             eventId.addItem(event.getId());
         }
-        eventId.setSelectedItem(attendee.getEventId());
+        eventId.setSelectedIndex(-1);
         eventId.setBounds(50, 320, 300, 35);
         eventId.setBackground(Color.LIGHT_GRAY);
         eventId.setFont(new Font("Arial", Font.PLAIN, 16));
@@ -106,16 +111,16 @@ public class EditAttendee extends JFrame {
         exit.addActionListener(e -> this.dispose());
         panel.add(exit);
 
-        JButton updateAttendeeButton = new JButton("Update Attendee");
-        updateAttendeeButton.setBounds(100, 400, 200, 45);
-        updateAttendeeButton.setBackground(new Color(51, 153, 255));
-        updateAttendeeButton.setForeground(Color.WHITE);
-        updateAttendeeButton.setFont(new Font("Arial", Font.BOLD, 16));
-        updateAttendeeButton.setFocusPainted(false);
-        updateAttendeeButton.setBorderPainted(false);
-        updateAttendeeButton.addActionListener(new ButtonListener());
+        JButton addAttendeeButton = new JButton("Register");
+        addAttendeeButton.setBounds(120, 400, 200, 45);
+        addAttendeeButton.setBackground(new Color(51, 153, 255));
+        addAttendeeButton.setForeground(Color.WHITE);
+        addAttendeeButton.setFont(new Font("Arial", Font.BOLD, 16));
+        addAttendeeButton.setFocusPainted(false);
+        addAttendeeButton.setBorderPainted(false);
+        addAttendeeButton.addActionListener(new ButtonListener());
 
-        panel.add(updateAttendeeButton);
+        panel.add(addAttendeeButton);
         add(panel);
     }
 
@@ -125,10 +130,10 @@ public class EditAttendee extends JFrame {
             String attendeeName = nameField.getText().trim();
             String attendeeEmail = emailField.getText().trim();
             String attendeePhone = phone.getText().trim();
-            Integer attendeeEventId = (Integer) eventId.getSelectedItem();
+            Integer attendeeEventId = (Integer)eventId.getSelectedItem();
 
             if (attendeeName.isEmpty()) {
-                showErrorDialog("Name is required");
+                showErrorDialog("Name is Empty");
                 return;
             }
             if (attendeeEmail.isEmpty()) {
@@ -136,40 +141,35 @@ public class EditAttendee extends JFrame {
                 return;
             }
             if (attendeePhone.isEmpty()) {
-                showErrorDialog("Phone is required");
+                showErrorDialog("Phone is required!");
                 return;
             }
             if (attendeeEventId == null) {
-                showErrorDialog("Event ID is required");
+                showErrorDialog("Event ID is required!");
                 return;
             }
 
-            attendee.setName(attendeeName);
-            attendee.setEmail(attendeeEmail);
-            attendee.setPhone(attendeePhone);
-            attendee.setEventId(attendeeEventId);
-
-            boolean flag = attendeeController.updateAttendee(attendee);
+            boolean flag = attendeeController.addAttendee(new Attendee(attendeeName, attendeeEmail, attendeePhone, attendeeEventId));
 
             if (flag) {
                 JOptionPane.showMessageDialog(
-                        EditAttendee.this,
-                        "Attendee Updated Successfully!",
+                        Register.this,
+                        "Attendee Added Successfully!",
                         "Success",
                         JOptionPane.INFORMATION_MESSAGE
                 );
-                SwingUtilities.getWindowAncestor((Component) e.getSource()).dispose();
+                SwingUtilities.getWindowAncestor((Component) e.getSource()).dispose(); // Close registration frame
             } else {
-                showErrorDialog("Can't update Attendee. Please try again later.");
+                showErrorDialog("Can't add Attendee \nPlease try again later");
             }
         }
     }
 
     private void showErrorDialog(String message) {
         JOptionPane.showMessageDialog(
-                EditAttendee.this,
+                Register.this,
                 message,
-                "Update Error",
+                "Registration Error",
                 JOptionPane.ERROR_MESSAGE
         );
     }

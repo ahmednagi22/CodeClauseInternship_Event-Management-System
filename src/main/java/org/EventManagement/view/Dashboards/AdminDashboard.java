@@ -1,4 +1,11 @@
-package org.EventManagement.view;
+package org.EventManagement.view.Dashboards;
+
+import org.EventManagement.view.Authentication.LoginFrame;
+import org.EventManagement.view.Utils.Utils;
+import org.EventManagement.view.manage.ManageAttendees;
+import org.EventManagement.view.manage.ManageEvents;
+import org.EventManagement.view.manage.ManageSchedules;
+import org.EventManagement.view.manage.ManageUsers;
 
 import javax.swing.*;
 import java.awt.*;
@@ -80,29 +87,20 @@ public class AdminDashboard extends JFrame {
             // Handle Dashboard button click
         } else if (buttonText.equals("Manage Attendees")) {
             this.dispose();
-            new ManageAttendees().setVisible(true);
+            new ManageAttendees("Organizer").setVisible(true);
         } else if (buttonText.equals("Manage Events")) {
             this.dispose();
-            new ManageEvents().setVisible(true);
+            new ManageEvents("Organizer").setVisible(true);
         } else if (buttonText.equals("Manage Schedules")) {
             this.dispose();
-            new ManageSchedules().setVisible(true);
+            new ManageSchedules("Organizer").setVisible(true);
         } else if (buttonText.equals("Manage Users")) {
             this.dispose();
-            new ManageUsers().setVisible(true);
+            new ManageUsers("Organizer").setVisible(true);
         } else if (buttonText.equals("Logout")) {
             this.dispose();
             new LoginFrame().setVisible(true);
             JOptionPane.showMessageDialog(this,"You Logged Out");
         }
-    }
-
-
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            AdminDashboard dashboard = new AdminDashboard();
-            dashboard.setVisible(true);
-        });
     }
 }

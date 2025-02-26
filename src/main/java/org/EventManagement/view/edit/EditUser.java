@@ -1,8 +1,9 @@
-package org.EventManagement.view;
+package org.EventManagement.view.edit;
 
 import org.EventManagement.database.UserRepository;
 import org.EventManagement.models.User;
 import org.EventManagement.controller.UserController;
+import org.EventManagement.view.Utils.GradientPanel;
 
 import javax.swing.*;
 import java.awt.*;

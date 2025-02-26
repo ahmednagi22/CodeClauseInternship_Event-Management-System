@@ -56,7 +56,7 @@ public class UserRepository {
         }
     }
 
-    public User findByEmail(String email) {
+    public User getUserByEmail(String email) {
         String query = "SELECT * FROM users WHERE email = ?";
         try(Connection connection = DatabaseConnector.getConnection();
             PreparedStatement statement = connection.prepareStatement(query);) {

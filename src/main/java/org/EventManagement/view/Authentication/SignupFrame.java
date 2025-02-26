@@ -1,27 +1,28 @@
-package org.EventManagement.view;
+package org.EventManagement.view.Authentication;
 
 import org.EventManagement.database.UserRepository;
 import org.EventManagement.models.User;
 import org.EventManagement.controller.UserController;
+import org.EventManagement.view.Utils.GradientPanel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class AddUser extends JFrame {
+public class SignupFrame extends JFrame {
     private final JTextField firstNameField;
     private final JTextField lastNameField;
     private final JTextField emailField;
     private final JPasswordField passwordField;
     private final JPasswordField confirmPasswordField;
     private final UserController userController;
-    private JComboBox<String> roleComboBox;
-    public AddUser() {
+
+    public SignupFrame() {
         userController = new UserController(new UserRepository()); // service initialization
 
-        setTitle("Add User");
-        setSize(400, 500);
+        setTitle("Sign Up");
+        setSize(400, 450);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
@@ -30,7 +31,7 @@ public class AddUser extends JFrame {
         GradientPanel panel = new GradientPanel();
         panel.setLayout(null);
 
-        JLabel titleLabel = new JLabel("Add User");
+        JLabel titleLabel = new JLabel("Sign Up");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         titleLabel.setForeground(Color.WHITE);
         titleLabel.setBounds(140, 20, 150, 40);
@@ -98,18 +99,6 @@ public class AddUser extends JFrame {
         confirmPasswordField.setBorder(null);
         panel.add(confirmPasswordField);
 
-        JLabel roleLabel = new JLabel("Role");
-        roleLabel.setForeground(Color.WHITE);
-        roleLabel.setBounds(50, 345, 140, 20);
-        panel.add(roleLabel);
-
-        roleComboBox = new JComboBox<>(new String[]{"Admin", "Organizer", "Attendee"});
-        roleComboBox.setSelectedIndex(-1);
-        roleComboBox.setBounds(50, 370, 300, 35);
-        roleComboBox.setBackground(Color.LIGHT_GRAY);
-        roleComboBox.setFont(new Font("Arial", Font.PLAIN, 16));
-        roleComboBox.setBorder(null);
-        add(roleComboBox);
         JButton exit = new JButton();
         exit.setBounds(367,5,30,30);
         ImageIcon icon = new ImageIcon("src/main/resources/Exit_button.png");
@@ -117,92 +106,88 @@ public class AddUser extends JFrame {
         exit.setIcon(icon);
         exit.setBorderPainted(false);
         exit.setFocusPainted(false);
-        exit.addActionListener(e -> this.dispose());
+        exit.addActionListener(e -> System.exit(0));
         panel.add(exit);
 
-        JButton AddUserButton = new JButton("Add User");
-        AddUserButton.setBounds(100, 425, 200, 45);
-        AddUserButton.setBackground(new Color(51, 153, 255));
-        AddUserButton.setForeground(Color.WHITE);
-        AddUserButton.setFont(new Font("Arial", Font.BOLD, 16));
-        AddUserButton.setFocusPainted(false);
-        AddUserButton.setBorderPainted(false);
-        AddUserButton.addActionListener(new ButtonListener());
+        JButton submitButton = new JButton("Submit");
+        submitButton.setBounds(100, 365, 200, 45);
+        submitButton.setBackground(new Color(51, 153, 255));
+        submitButton.setForeground(Color.WHITE);
+        submitButton.setFont(new Font("Arial", Font.BOLD, 16));
+        submitButton.setFocusPainted(false);
+        submitButton.setBorderPainted(false);
+        submitButton.addActionListener(new ButtonListener());
 
-        panel.add(AddUserButton);
+        panel.add(submitButton);
         add(panel);
     }
     private class ButtonListener implements ActionListener {
         @Override
-        public void actionPerformed(ActionEvent e){
-                String firstName = firstNameField.getText().trim();
-                String lastName = lastNameField.getText().trim();
-                String email = emailField.getText().trim();
-                String userRole = (String) roleComboBox.getSelectedItem();
-                char[] passwordArray = passwordField.getPassword();
-                String password = new String(passwordArray).trim();
-                java.util.Arrays.fill(passwordArray, '\0'); // Clear password from memory
+        public void actionPerformed(ActionEvent e) {
+            String firstName = firstNameField.getText().trim();
+            String lastName = lastNameField.getText().trim();
+            String email = emailField.getText().trim();
+            String role = "Attendee"; // default value
+            char[] passwordArray = passwordField.getPassword();
+            String password = new String(passwordArray).trim();
+            java.util.Arrays.fill(passwordArray, '\0'); // Clear password from memory
 
-                char[] confirmPasswordArray = confirmPasswordField.getPassword();
-                String confirmPassword = new String(confirmPasswordArray).trim();
-                java.util.Arrays.fill(confirmPasswordArray, '\0'); // Clear password from memory
-
-                 System.out.println(userRole);
-
-                // Validate empty fields with detailed error messages
-                if (firstName.isEmpty()) {
-                    showErrorDialog("First Name is Empty");
-                    return;
-                }
-                if (lastName.isEmpty()) {
-                    showErrorDialog("Last Name is Empty");
-                    return;
-                }
-                if (email.isEmpty()) {
-                    showErrorDialog("Email Is Required!");
-                    return;
-                }
-                if (password.isEmpty()) {
-                    showErrorDialog("Password cannot be empty!");
-                    return;
-                }
-                if (password.length() < 6) {
-                    showErrorDialog("Password must be at least 6 characters!");
-                    return;
-                }
-                if (confirmPassword.isEmpty()) {
-                    showErrorDialog("Please Confirm The Password");
-                    return;
-                }
-                if (!password.equals(confirmPassword)) {
-                    showErrorDialog("Passwords do not match!");
-                    return;
-                }
-                if(userRole == null){
-                showErrorDialog("Please Select a User Role");
+            char[] confirmPasswordArray = confirmPasswordField.getPassword();
+            String confirmPassword = new String(confirmPasswordArray).trim();
+            java.util.Arrays.fill(confirmPasswordArray, '\0'); // Clear password from memory
+            // Validate empty fields with detailed error messages
+            if (firstName.isEmpty()) {
+                showErrorDialog("First Name is Empty");
                 return;
-                 }
-                boolean flag = userController.addUser(new User(firstName, lastName, email, password, userRole));
+            }
+            if (lastName.isEmpty()) {
+                showErrorDialog("Last Name is Empty");
+                return;
+            }
+            if (email.isEmpty()) {
+                showErrorDialog("Email Is Required!");
+                return;
+            }
+            if (password.isEmpty()) {
+                showErrorDialog("Password cannot be empty!");
+                return;
+            }
+            if (password.length() < 6) {
+                showErrorDialog("Password must be at least 6 characters!");
+                return;
+            }
+            if (confirmPassword.isEmpty()) {
+                showErrorDialog("Please Confirm The Password");
+                return;
+            }
+            if (!password.equals(confirmPassword)) {
+                showErrorDialog("Passwords do not match!");
+                return;
+            }
 
-                if (flag) {
-                    JOptionPane.showMessageDialog(
-                            AddUser.this,
-                            "User Added Successfully!",
-                            "Success",
-                            JOptionPane.INFORMATION_MESSAGE
-                    );
-                    SwingUtilities.getWindowAncestor((Component) e.getSource()).dispose(); // Close registration frame
-                } else {
-                    showErrorDialog("Email already taken!\nPlease try a different one.");
-                }
+            boolean flag = userController.addUser(new User(firstName, lastName, email, password,role));
+
+            if (flag) {
+                JOptionPane.showMessageDialog(
+                        SignupFrame.this,
+                        "You registered successfully!",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+                new LoginFrame().setVisible(true);
+                SwingUtilities.getWindowAncestor((Component) e.getSource()).dispose(); // Close registration frame
+            } else {
+                showErrorDialog("Email already taken!\nPlease try a different one.");
             }
         }
         private void showErrorDialog(String message) {
             JOptionPane.showMessageDialog(
-                    AddUser.this,
+                    SignupFrame.this,
                     message,
                     "Registration Error",
                     JOptionPane.ERROR_MESSAGE
             );
         }
     }
+
+}
