@@ -29,6 +29,8 @@ The **Event Management System** is a Java-based desktop application that allows 
 - **JDBC** - Java Database Connectivity for interacting with MySQL
 - **Maven** - Build automation
 
+## Demo
+https://drive.google.com/file/d/1uEqHd2_ks5eU1j-ekqhUgSNYVLHJLzzO/view?usp=sharing
 ## 📸 Screenshots
 ![Screenshot 2025-02-27 000326](https://github.com/user-attachments/assets/fe923a22-092c-4211-81a0-9dc57ea5b60a)
 
